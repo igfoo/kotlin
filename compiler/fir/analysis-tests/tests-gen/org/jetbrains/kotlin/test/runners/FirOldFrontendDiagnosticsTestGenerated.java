@@ -10499,6 +10499,12 @@ public class FirOldFrontendDiagnosticsTestGenerated extends AbstractFirDiagnosti
                 }
 
                 @Test
+                @TestMetadata("genericOuterClass.kt")
+                public void testGenericOuterClass() throws Exception {
+                    runTest("compiler/testData/diagnostics/tests/extensions/contextReceivers/genericOuterClass.kt");
+                }
+
+                @Test
                 @TestMetadata("insideDeclaration.kt")
                 public void testInsideDeclaration() throws Exception {
                     runTest("compiler/testData/diagnostics/tests/extensions/contextReceivers/insideDeclaration.kt");
@@ -10520,6 +10526,12 @@ public class FirOldFrontendDiagnosticsTestGenerated extends AbstractFirDiagnosti
                 @TestMetadata("noExplicitReceiver.kt")
                 public void testNoExplicitReceiver() throws Exception {
                     runTest("compiler/testData/diagnostics/tests/extensions/contextReceivers/noExplicitReceiver.kt");
+                }
+
+                @Test
+                @TestMetadata("outerClass.kt")
+                public void testOuterClass() throws Exception {
+                    runTest("compiler/testData/diagnostics/tests/extensions/contextReceivers/outerClass.kt");
                 }
 
                 @Test
