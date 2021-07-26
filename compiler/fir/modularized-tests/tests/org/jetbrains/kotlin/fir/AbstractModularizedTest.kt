@@ -36,7 +36,6 @@ data class ModuleData(
 ) {
     val qualifiedName get() = if (name in qualifier) qualifier else "$name.$qualifier"
 
-    val outputDir = rawOutputDir.fixPath()
     val classpath = rawClasspath.map { it.fixPath() }
     val sources = rawSources.map { it.fixPath() }
     val javaSourceRoots = rawJavaSourceRoots.map { JavaSourceRootData(it.path.fixPath(), it.packagePrefix) }
@@ -97,6 +96,9 @@ abstract class AbstractModularizedTest : KtUsefulTestCase() {
             configuration.addJavaSourceRoot(it.path, it.packagePrefix)
         }
         configuration.addJvmClasspathRoots(moduleData.classpath)
+
+        // ignored for modular jdks
+        configuration.put(JVMConfigurationKeys.NO_JDK, true)
 
         // in case of modular jdk only
         configuration.putIfNotNull(JVMConfigurationKeys.JDK_HOME, moduleData.modularJdkRoot)
