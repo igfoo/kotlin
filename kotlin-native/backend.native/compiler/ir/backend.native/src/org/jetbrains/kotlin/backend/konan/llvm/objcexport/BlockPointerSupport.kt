@@ -270,9 +270,9 @@ internal class BlockGenerator(private val codegen: CodeGenerator) {
                     .single { it.name == OperatorNameConventions.INVOKE }
 
             val callee = lookupVirtualImpl(kotlinFunction, invokeMethod)
+            val llvmDeclarations = FunctionLlvmDeclarations(callee, VirtualFunctionProto(invokeMethod))
 
-            val result = callFromBridge(callee, listOf(kotlinFunction) + kotlinArguments, Lifetime.ARGUMENT)
-
+            val result = callFromBridge(llvmDeclarations, listOf(kotlinFunction) + kotlinArguments, Lifetime.ARGUMENT)
             if (bridge.returnsVoid) {
                 ret(null)
             } else {
@@ -335,8 +335,13 @@ internal class BlockGenerator(private val codegen: CodeGenerator) {
     }
 }
 
-private val ObjCExportCodeGeneratorBase.retainBlock get() = context.llvm.externalFunction(
-        "objc_retainBlock",
-        functionType(int8TypePtr, false, int8TypePtr),
-        CurrentKlibModuleOrigin
-)
+private val ObjCExportCodeGeneratorBase.retainBlock: FunctionLlvmDeclarations
+    get() {
+        val functionProto = LlvmFunctionProto(
+            "objc_retainBlock",
+            LlvmParameter(int8TypePtr),
+            listOf(LlvmParameter(int8TypePtr)),
+            origin = CurrentKlibModuleOrigin
+        )
+        return context.llvm.externalFunction(functionProto)
+    }
