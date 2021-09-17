@@ -346,6 +346,9 @@ abstract class BasicIrBoxTest(
                     logger.logFile("Output d.ts", dtsFile)
                     dtsFile.write(compiledModule.tsDefinitions ?: error("No ts definitions"))
                 }
+
+                // TODO: Do we need to verify directives in compiledDCEOutput?
+                compiledOutput.jsProgram?.let { processJsProgram(it, units) }
             }
 
             if (runIrPir) {
@@ -367,6 +370,7 @@ abstract class BasicIrBoxTest(
                     verifySignatures = !skipMangleVerification,
                 )
                 compiledModule.outputs!!.writeTo(pirOutputFile, config)
+                processJsProgram(compiledModule.outputs!!.jsProgram!!, units)
             }
         }
     }
