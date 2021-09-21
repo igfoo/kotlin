@@ -88,18 +88,6 @@ private class AutoboxingTransformer(val context: Context) : AbstractValueUsageTr
     }
 
     override fun IrExpression.useAs(type: IrType): IrExpression {
-        if (this.isNullConst() && type.isNullablePointer()) {
-            // TODO: consider using IrConst with proper type.
-            return IrCallImpl.fromSymbolDescriptor(
-                    startOffset,
-                    endOffset,
-                    symbols.getNativeNullPtr.owner.returnType,
-                    symbols.getNativeNullPtr,
-                    symbols.getNativeNullPtr.owner.typeParameters.size,
-                    symbols.getNativeNullPtr.owner.valueParameters.size
-            ).uncheckedCast(type)
-        }
-
         val actualType = when (this) {
             is IrCall -> {
                 if (this.symbol.owner.isSuspend) irBuiltIns.anyNType
@@ -122,9 +110,6 @@ private class AutoboxingTransformer(val context: Context) : AbstractValueUsageTr
         }
         return this.adaptIfNecessary(actualType, type)
     }
-
-    private fun IrType.isNullablePointer(): Boolean =
-            this.containsNull() && this.computePrimitiveBinaryTypeOrNull() == PrimitiveBinaryType.POINTER
 
     private val IrFunctionAccessExpression.target: IrFunction get() = when (this) {
         is IrCall -> this.callTarget

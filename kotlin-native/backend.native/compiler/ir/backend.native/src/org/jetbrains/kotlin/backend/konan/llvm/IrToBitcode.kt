@@ -1838,10 +1838,14 @@ internal class CodeGeneratorVisitor(val context: Context, val lifetimes: Map<IrE
                 val constructedType = value.value.type
                 val needBoxing = context.ir.symbols.getTypeConversion(constructedType, value.type) != null
                 if (needBoxing) {
-                    context.llvm.staticData.createConstKotlinObject(
-                            constructedType.getClass()!!,
-                            evaluateConst(value.value)
-                    )
+                    if (value.value.kind == IrConstKind.Null) {
+                        Zero(codegen.getLLVMType(value.type))
+                    } else {
+                        context.llvm.staticData.createConstKotlinObject(
+                                constructedType.getClass()!!,
+                                evaluateConst(value.value)
+                        )
+                    }
                 } else {
                     evaluateConst(value.value)
                 }
