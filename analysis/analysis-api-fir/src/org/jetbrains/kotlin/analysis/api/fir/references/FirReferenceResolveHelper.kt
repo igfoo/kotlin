@@ -298,6 +298,10 @@ internal object FirReferenceResolveHelper {
                 if (diagnostic is ConeAmbiguousLabelError) {
                     return diagnostic.symbols.map { it.fir.buildSymbol(symbolBuilder) }
                 }
+            } else if (fir is FirPropertyAccessExpression && fir.calleeReference is FirSuperReference) {
+                // If the cursor position is on the label of `super`, we want to resolve to the current class. FIR represents `super` as
+                // `this.super`, so the current type is available from the dispatch receiver.
+                return listOfNotNull((fir.dispatchReceiver.typeRef as? FirResolvedTypeRef)?.toTargetSymbol(session, symbolBuilder))
             }
         }
         val calleeReference =

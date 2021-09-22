@@ -445,9 +445,15 @@ public class ReferenceResolveTestGenerated extends AbstractReferenceResolveTest 
     }
 
     @Test
-    @TestMetadata("superWithLabel.kt")
-    public void testSuperWithLabel() throws Exception {
-        runTest("analysis/analysis-api/testData/referenceResolve/superWithLabel.kt");
+    @TestMetadata("superWithLabel_caretAtLabel.kt")
+    public void testSuperWithLabel_caretAtLabel() throws Exception {
+        runTest("analysis/analysis-api/testData/referenceResolve/superWithLabel_caretAtLabel.kt");
+    }
+
+    @Test
+    @TestMetadata("superWithLabel_caretAtSuper.kt")
+    public void testSuperWithLabel_caretAtSuper() throws Exception {
+        runTest("analysis/analysis-api/testData/referenceResolve/superWithLabel_caretAtSuper.kt");
     }
 
     @Test
