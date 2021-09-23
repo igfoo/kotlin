@@ -1836,11 +1836,13 @@ internal class CodeGeneratorVisitor(val context: Context, val lifetimes: Map<IrE
         return when (value) {
             is IrConstantPrimitive -> {
                 val constructedType = value.value.type
-                val needBoxing = context.ir.symbols.getTypeConversion(constructedType, value.type) != null
-                if (needBoxing) {
+                if (context.ir.symbols.getTypeConversion(constructedType, value.type) != null) {
                     if (value.value.kind == IrConstKind.Null) {
                         Zero(codegen.getLLVMType(value.type))
                     } else {
+                        require(codegen.getLLVMType(value.type) == codegen.kObjHeaderPtr) {
+                            "Can't wrap ${value.value.kind.asString} constant to type ${value.type.render()}"
+                        }
                         context.llvm.staticData.createConstKotlinObject(
                                 constructedType.getClass()!!,
                                 evaluateConst(value.value)
@@ -1884,6 +1886,7 @@ internal class CodeGeneratorVisitor(val context: Context, val lifetimes: Map<IrE
                     }
                 }
 
+                require(codegen.getLLVMType(value.type) == codegen.kObjHeaderPtr) { "Constant object is not an object, but ${value.type.render()}" }
                 context.llvm.staticData.createConstKotlinObject(
                         constructedClass,
                         *fields.toTypedArray()
