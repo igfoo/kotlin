@@ -144,27 +144,14 @@ private class AutoboxingTransformer(val context: Context) : AbstractValueUsageTr
         return if (conversion == null) {
             this
         } else {
-            if (this is IrConst<*>) {
-                return IrConstantPrimitiveImpl(this.startOffset, this.endOffset, this).apply {
-                    type = expectedType
-                }
-            }
-            if (this is IrConstantValue) {
-                return when (this) {
-                    is IrConstantPrimitive -> {
-                        this.apply { type = expectedType }
-                    }
-                    is IrConstantObject -> {
-                        val expectedInlinedType = expectedType.getInlinedClassNative()
-                        if (expectedInlinedType != null) {
-                            this.valueArguments.singleOrNull()?.useAs(expectedType)
-                                    ?: error("Inline class must have single argument constructor")
-                        } else {
-                            this
-                        }
-                    }
-                    else -> TODO("Boxing/unboxing of ${this::class.qualifiedName} is not supported")
-                }
+            when (this) {
+                is IrConst<*> -> IrConstantPrimitiveImpl(this.startOffset, this.endOffset, this)
+                is IrConstantPrimitive, is IrConstantObject -> this
+                is IrConstantValue -> TODO("Boxing/unboxing of ${this::class.qualifiedName} is not supported")
+                else -> null
+            }?.let {
+                it.type = expectedType
+                return it
             }
             val parameter = conversion.owner.explicitParameters.single()
             val argument = this.uncheckedCast(parameter.type)
