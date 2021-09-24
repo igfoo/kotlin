@@ -150,6 +150,8 @@ interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext, TypeSy
         return this as? DefinitelyNotNullType
     }
 
+    override fun KotlinTypeMarker.isNotNullTypeVariable(): Boolean = this is NotNullTypeVariable
+
     override fun SimpleTypeMarker.isMarkedNullable(): Boolean {
         require(this is SimpleType, this::errorMessage)
         return this.isMarkedNullable
