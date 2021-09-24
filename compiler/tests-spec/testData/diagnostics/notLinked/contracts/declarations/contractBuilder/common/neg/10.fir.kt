@@ -4,7 +4,7 @@ import kotlin.contracts.*
 
 // TESTCASE NUMBER: 1
 inline fun case_1(block: () -> Unit) {
-    contract test@ {
+    contract <!REDUNDANT_LABEL_WARNING!>test@<!> {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
     return block()

@@ -1,7 +1,7 @@
 
 fun test1() {
     1. (<!FUNCTION_EXPECTED!>fun String.(i: Int) = i<!> )(1)
-    1.(<!FUNCTION_EXPECTED!>label@ fun String.(i: Int) = i<!> )(1)
+    1.(<!FUNCTION_EXPECTED!><!REDUNDANT_LABEL_WARNING!>label@<!> fun String.(i: Int) = i<!> )(1)
 }
 
 fun test2(f: String.(Int) -> Unit) {

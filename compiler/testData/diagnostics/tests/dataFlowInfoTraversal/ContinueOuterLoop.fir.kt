@@ -21,7 +21,7 @@ fun doWhileLoop(x: Int?) {
 }
 
 fun whileLoopContinueInnerOuter(x: Int?) {
-    outer@ while (x != 0) {
+    <!REDUNDANT_LABEL_WARNING!>outer@<!> while (x != 0) {
         inner@ while (x != 1) {
             while (x != 2) {
                 if (x == 3) continue@inner

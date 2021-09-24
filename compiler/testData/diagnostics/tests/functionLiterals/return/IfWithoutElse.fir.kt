@@ -10,6 +10,6 @@ val b/*: () -> Int */ = l@ {
     5
 }
 
-val c/*: () -> Unit */ = l@ {
+val c/*: () -> Unit */ = <!REDUNDANT_LABEL_WARNING!>l@<!> {
     if (flag) 4
 }

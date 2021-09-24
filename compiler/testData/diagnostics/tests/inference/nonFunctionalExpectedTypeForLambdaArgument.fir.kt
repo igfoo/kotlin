@@ -5,11 +5,11 @@ fun <T> callParam(arg: T) {}
 
 fun testAny() {
     callAny { error -> error }
-    callAny l@{ error -> error }
+    callAny <!REDUNDANT_LABEL_WARNING!>l@<!>{ error -> error }
     callAny({error -> error})
     callAny(({error -> error}))
-    callAny(l@{error -> error})
-    callAny((l@{error -> error}))
+    callAny(<!REDUNDANT_LABEL_WARNING!>l@<!>{error -> error})
+    callAny((<!REDUNDANT_LABEL_WARNING!>l@<!>{error -> error}))
 }
 
 fun testAnyCall() {

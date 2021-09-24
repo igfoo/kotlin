@@ -22,14 +22,14 @@ fun c(): Unit = run {
     }
 }
 
-fun d(): Unit = run outer@{
+fun d(): Unit = run <!REDUNDANT_LABEL_WARNING!>outer@<!>{
     run inner@{
         return@inner materialize()
     }
 }
 
 fun e(): Unit = run outer@{
-    run inner@{
+    run <!REDUNDANT_LABEL_WARNING!>inner@<!>{
         return@outer materialize()
     }
 }

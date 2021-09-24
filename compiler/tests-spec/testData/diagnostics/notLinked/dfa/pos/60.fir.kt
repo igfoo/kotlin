@@ -6,8 +6,8 @@
 fun case_1() {
     var x: String? = null
 
-    outer@ while (x != null) {
-        inner@ do {
+    <!REDUNDANT_LABEL_WARNING!>outer@<!> while (x != null) {
+        <!REDUNDANT_LABEL_WARNING!>inner@<!> do {
             x = null
         } while (<!SENSELESS_COMPARISON!>x == null<!>)
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.String? & kotlin.Nothing")!>x<!>

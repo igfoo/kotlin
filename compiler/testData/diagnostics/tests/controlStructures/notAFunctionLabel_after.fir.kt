@@ -30,12 +30,12 @@ fun testAnnotatedLambdaLabel() =
     }
 
 fun testLambdaMultipleLabels1() =
-    lambda1@ lambda2@ {
+    <!REDUNDANT_LABEL_WARNING!>lambda1@<!> <!REDUNDANT_LABEL_WARNING!>lambda2@<!> {
         <!NOT_A_FUNCTION_LABEL!>return@lambda1<!>
     }
 
 fun testLambdaMultipleLabels2() =
-    lambda1@ lambda2@ {
+    <!REDUNDANT_LABEL_WARNING!>lambda1@<!> lambda2@ {
         return@lambda2
     }
 
@@ -45,24 +45,24 @@ fun testAnonymousFunctionLabel() =
     }
 
 fun testLoopLabelInReturn(xs: List<Int>) {
-    L@ for (x in xs) {
+    <!REDUNDANT_LABEL_WARNING!>L@<!> for (x in xs) {
         if (x > 0) <!NOT_A_FUNCTION_LABEL!>return@L<!>
     }
 }
 
 fun testValLabelInReturn() {
-    L@ val fn = { <!NOT_A_FUNCTION_LABEL!>return@L<!> }
+    <!REDUNDANT_LABEL_WARNING!>L@<!> val fn = { <!NOT_A_FUNCTION_LABEL!>return@L<!> }
     fn()
 }
 
 fun testHighOrderFunctionCallLabelInReturn() {
-    L@ run {
+    <!REDUNDANT_LABEL_WARNING!>L@<!> run {
         <!NOT_A_FUNCTION_LABEL!>return@L<!>
     }
 }
 
 fun testMultipleLabelsWithNestedLambda() {
-    l1@ l2@{
+    <!REDUNDANT_LABEL_WARNING!>l1@<!> l2@{
         {
             <!NOT_A_FUNCTION_LABEL!>return@l1<!>
         }

@@ -68,7 +68,7 @@ fun case_5(a: Interface1?, b: Interface2?) {
     b as Interface1?
     a as Interface2?
 
-    val foo = l1@ fun(): Any {
+    val foo = <!REDUNDANT_LABEL_WARNING!>l1@<!> fun(): Any {
         val bar = l2@ fun() {
             val c = select(a, b) ?: return@l2
             <!DEBUG_INFO_EXPRESSION_TYPE("Interface2 & Interface1")!>c<!>.itest()
@@ -103,7 +103,7 @@ fun case_7(a: Interface1?, b: Interface2?) {
     b as Interface1?
     a as Interface2?
 
-    val foo = l1@ fun(): Any {
+    val foo = <!REDUNDANT_LABEL_WARNING!>l1@<!> fun(): Any {
         val bar = l2@ fun() {
             val c = select(a, b)
             c ?: return@l2

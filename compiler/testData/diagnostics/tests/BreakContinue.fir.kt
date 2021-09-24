@@ -2,7 +2,7 @@ class C {
 
     fun f (a : Boolean, b : Boolean) {
         b@ while (true)
-          a@ {
+          <!REDUNDANT_LABEL_WARNING!>a@<!> {
             <!NOT_A_LOOP_LABEL!>break@f<!>
             break
             break@b
@@ -12,7 +12,7 @@ class C {
         <!BREAK_OR_CONTINUE_OUTSIDE_A_LOOP!>continue<!>
 
         b@ while (true)
-          a@ {
+          <!REDUNDANT_LABEL_WARNING!>a@<!> {
             <!NOT_A_LOOP_LABEL!>continue@f<!>
             continue
             continue@b
@@ -49,7 +49,7 @@ class C {
     }
 
     fun containsIllegalBreak(a: String?) {
-        loop@ while(a == null) {
+        <!REDUNDANT_LABEL_WARNING!>loop@<!> while(a == null) {
             <!NOT_A_LOOP_LABEL!>break@label<!>
         }
         a.compareTo("2")
@@ -75,7 +75,7 @@ class C {
 
     fun unresolvedBreak(a: String?, array: Array<Int>) {
         while(a == null) {
-            l@ for (el in array) {
+            <!REDUNDANT_LABEL_WARNING!>l@<!> for (el in array) {
                 break
             }
             if (true) break else <!NOT_A_LOOP_LABEL!>break@l<!>
@@ -84,7 +84,7 @@ class C {
     }
 
     fun twoLabelsOnLoop() {
-        label1@ label2@ for (i in 1..100) {
+        <!REDUNDANT_LABEL_WARNING!>label1@<!> label2@ for (i in 1..100) {
             if (i > 0) {
                 <!NOT_A_LOOP_LABEL!>break@label1<!>
             }

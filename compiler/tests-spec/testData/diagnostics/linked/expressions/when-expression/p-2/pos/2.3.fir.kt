@@ -67,7 +67,7 @@ fun case_6(value_1: Nothing, value_2: TypesProvider): String {
 // TESTCASE NUMBER: 5
 fun case_5(value_1: TypesProvider, value_2: Nothing) {
     loop1@ while (true) {
-        loop2@ while (true) {
+        <!REDUNDANT_LABEL_WARNING!>loop2@<!> while (true) {
             loop3@ while (true) {
                 when {
                     continue@loop1 == throw throw throw throw Exception() -> return

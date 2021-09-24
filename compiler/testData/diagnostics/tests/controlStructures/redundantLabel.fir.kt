@@ -2,38 +2,38 @@
 @Retention(AnnotationRetention.SOURCE)
 annotation class Ann
 
-fun testLambdaLabel() = l@ { 42 }
+fun testLambdaLabel() = <!REDUNDANT_LABEL_WARNING!>l@<!> { 42 }
 
-fun testAnonymousFunctionLabel() = l@ fun() {}
+fun testAnonymousFunctionLabel() = <!REDUNDANT_LABEL_WARNING!>l@<!> fun() {}
 
-fun testAnnotatedLambdaLabel() = lambda@ @Ann {}
+fun testAnnotatedLambdaLabel() = <!REDUNDANT_LABEL_WARNING!>lambda@<!> @Ann {}
 
-fun testParenthesizedLambdaLabel() = lambda@ ( {} )
+fun testParenthesizedLambdaLabel() = <!REDUNDANT_LABEL_WARNING!>lambda@<!> ( {} )
 
-fun testLabelBoundToInvokeOperatorExpression() = l@ { 42 }()
+fun testLabelBoundToInvokeOperatorExpression() = <!REDUNDANT_LABEL_WARNING!>l@<!> { 42 }()
 
-fun testLabelBoundToLambda() = (l@ { 42 })()
+fun testLabelBoundToLambda() = (<!REDUNDANT_LABEL_WARNING!>l@<!> { 42 })()
 
 fun testWhileLoopLabel() {
-    L@ while (true) {}
+    <!REDUNDANT_LABEL_WARNING!>L@<!> while (true) {}
 }
 
 fun testDoWhileLoopLabel() {
-    L@ do {} while (true)
+    <!REDUNDANT_LABEL_WARNING!>L@<!> do {} while (true)
 }
 
 fun testForLoopLabel(xs: List<Any>) {
-    L@ for (x in xs) {}
+    <!REDUNDANT_LABEL_WARNING!>L@<!> for (x in xs) {}
 }
 
 fun testValLabel() {
-    L@ val fn = {}
+    <!REDUNDANT_LABEL_WARNING!>L@<!> val fn = {}
     fn()
 }
 
 fun testHighOrderFunctionCallLabel() {
-    L@ run {}
+    <!REDUNDANT_LABEL_WARNING!>L@<!> run {}
 }
 
 fun testAnonymousObjectLabel() =
-    L@ object {}
+    <!REDUNDANT_LABEL_WARNING!>L@<!> object {}

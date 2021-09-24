@@ -8,5 +8,5 @@ fun <T> bar(block: (T) -> Int) {}
 
 fun foo() {
     bar<Int> @Ann @[Ann] { x -> x }
-    bar<Int> @Ann @[Ann] label@{ x -> x }
+    bar<Int> @Ann @[Ann] <!REDUNDANT_LABEL_WARNING!>label@<!>{ x -> x }
 }

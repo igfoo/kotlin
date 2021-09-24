@@ -1,7 +1,7 @@
 // !DUMP_CFG
 
 val x4: (String) -> Unit = run {
-    return@run (lambda@{ foo: String ->
+    return@run (<!REDUNDANT_LABEL_WARNING!>lambda@<!>{ foo: String ->
         bar(foo)
     })
 }

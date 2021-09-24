@@ -8,10 +8,7 @@ package org.jetbrains.kotlin.fir.declarations.utils
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.fir.FirRenderer
 import org.jetbrains.kotlin.fir.declarations.*
-import org.jetbrains.kotlin.fir.declarations.impl.FirResolvedDeclarationStatusImpl
 import org.jetbrains.kotlin.fir.render
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.contract
 
 inline val FirMemberDeclaration.modality: Modality? get() = status.modality
 inline val FirMemberDeclaration.isAbstract: Boolean get() = status.modality == Modality.ABSTRACT
@@ -24,8 +21,10 @@ inline val FirMemberDeclaration.isFinal: Boolean
     }
 
 inline val FirMemberDeclaration.visibility: Visibility get() = status.visibility
-inline val FirMemberDeclaration.effectiveVisibility: EffectiveVisibility
+inline val FirMemberDeclaration.effectiveVisibilityOrNull: EffectiveVisibility?
     get() = (status as? FirResolvedDeclarationStatus)?.effectiveVisibility
+inline val FirMemberDeclaration.effectiveVisibility: EffectiveVisibility
+    get() = effectiveVisibilityOrNull
         ?: error("Effective visibility for ${render(FirRenderer.RenderMode.NoBodies)} must be resolved")
 
 inline val FirMemberDeclaration.allowsToHaveFakeOverride: Boolean
@@ -74,4 +73,4 @@ inline val FirProperty.allowsToHaveFakeOverride: Boolean get() = visibility.allo
 inline val Visibility.allowsToHaveFakeOverride: Boolean
     get() = !Visibilities.isPrivate(this) && this != Visibilities.InvisibleFake
 
-inline val FirSimpleFunction.isLocal: Boolean get() = status.visibility == Visibilities.Local
+inline val FirCallableDeclaration.isLocal: Boolean get() = status.visibility == Visibilities.Local

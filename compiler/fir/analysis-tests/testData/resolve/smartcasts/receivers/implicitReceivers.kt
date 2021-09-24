@@ -34,9 +34,9 @@ fun Any?.test_2() {
 }
 
 fun test_3(a: Any, b: Any, c: Any) {
-    with(a) wa@{
+    with(a) <!REDUNDANT_LABEL_WARNING!>wa@<!>{
         with(b) wb@{
-            with(c) wc@{
+            with(c) <!REDUNDANT_LABEL_WARNING!>wc@<!>{
                 this@wb as A
                 this@wb.foo()
                 foo()

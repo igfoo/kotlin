@@ -543,7 +543,7 @@ fun case_37(x: Any?): Any? = case_37 l@ {
 
 // TESTCASE NUMBER: 38
 fun case_39(x: MutableCollection<in Number>?) {
-    (l1@ {
+    (<!REDUNDANT_LABEL_WARNING!>l1@<!> {
         (l2@ {
             if (x !== null) else {
                 return@l2

@@ -16,7 +16,7 @@ fun test() {
             <!SUSPENSION_POINT_INSIDE_CRITICAL_SECTION!>suspensionPoint<!>()
         }
 
-        synchronized(lock) label@{
+        synchronized(lock) <!REDUNDANT_LABEL_WARNING!>label@<!>{
             <!SUSPENSION_POINT_INSIDE_CRITICAL_SECTION!>suspensionPoint<!>()
         }
 

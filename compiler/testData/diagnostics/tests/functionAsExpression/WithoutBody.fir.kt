@@ -7,6 +7,6 @@ fun bar(a: Any) = fun ()
 
 fun outer() {
     bar(fun ())
-    bar(l@ fun ())
+    bar(<!REDUNDANT_LABEL_WARNING!>l@<!> fun ())
     bar(@ann fun ())
 }

@@ -6,6 +6,6 @@ fun autolabel(l: List<Int>) = l.map (fun (i: Int): Int {
     return@map 4
 })
 
-fun unresolvedMapLabel(l: List<Int>) = l.map (l@ fun(i: Int): Int {
+fun unresolvedMapLabel(l: List<Int>) = l.map (<!REDUNDANT_LABEL_WARNING!>l@<!> fun(i: Int): Int {
     <!RETURN_NOT_ALLOWED!>return@map<!> 4
 })

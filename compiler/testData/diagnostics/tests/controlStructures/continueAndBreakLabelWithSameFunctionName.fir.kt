@@ -42,11 +42,11 @@ class Test6 {
 
 class Test7 {
     fun Test7() {
-        Test8@ while (true) {
+        <!REDUNDANT_LABEL_WARNING!>Test8@<!> while (true) {
             <!NOT_A_LOOP_LABEL!>break@Test7<!>
         }
 
-        Test7@ while (true) {
+        <!REDUNDANT_LABEL_WARNING!>Test7@<!> while (true) {
             <!NOT_A_LOOP_LABEL!>break@Test8<!>
         }
     }

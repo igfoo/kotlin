@@ -17,6 +17,6 @@ val d: () -> Int = l@ {
     5
 }
 
-val e: () -> Int = <!INITIALIZER_TYPE_MISMATCH!>l@ {
+val e: () -> Int = <!INITIALIZER_TYPE_MISMATCH!><!REDUNDANT_LABEL_WARNING!>l@<!> {
     if (flag) 4
 }<!>

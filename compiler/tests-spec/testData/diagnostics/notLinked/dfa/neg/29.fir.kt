@@ -29,7 +29,7 @@ fun case_2(a: Any?) {
 // TESTCASE NUMBER: 3
 fun case_3(a: Any?) {
     loop1@ while (true) {
-        loop2@ while (true) {
+        <!REDUNDANT_LABEL_WARNING!>loop2@<!> while (true) {
             if (true) break
             if (a == null) return continue@loop1
         }
@@ -42,7 +42,7 @@ fun case_3(a: Any?) {
 // TESTCASE NUMBER: 4
 fun case_4(a: Any?) {
     loop1@ while (true) {
-        loop2@ while (true) {
+        <!REDUNDANT_LABEL_WARNING!>loop2@<!> while (true) {
             break@loop1
             if (a == null) return
         }
@@ -58,7 +58,7 @@ fun case_4(a: Any?) {
  */
 fun case_5(a: Any?) {
     loop1@ while (true) {
-        loop2@ while (true) {
+        <!REDUNDANT_LABEL_WARNING!>loop2@<!> while (true) {
             return break@loop1
             if (a == null) return
         }
@@ -74,7 +74,7 @@ fun case_5(a: Any?) {
  */
 fun case_6(a: Any?) {
     loop1@ while (true) {
-        loop2@ while (true) {
+        <!REDUNDANT_LABEL_WARNING!>loop2@<!> while (true) {
             throw break@loop1
             if (a == null) return
         }
@@ -90,7 +90,7 @@ fun case_6(a: Any?) {
  */
 fun case_7(a: Any?) {
     loop1@ while (true) {
-        loop2@ while (true) {
+        <!REDUNDANT_LABEL_WARNING!>loop2@<!> while (true) {
             throw continue@loop1
             if (a == null) return
         }
@@ -104,7 +104,7 @@ fun case_7(a: Any?) {
 fun case_8(a: Any?) {
     var b: Any? = 10
     loop1@ while (b != null) {
-        loop2@ while (true) {
+        <!REDUNDANT_LABEL_WARNING!>loop2@<!> while (true) {
             b = null
             return continue@loop1
             if (a == null) return

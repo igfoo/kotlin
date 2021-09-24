@@ -30,8 +30,8 @@ fun threeLevelsReturnNoInitialization(x: Int?): Int? {
     // Hence, outer doesn't performs definite initialization
     val y: Int
     myRun outer@ {
-        myRun middle@ {
-            x.myLet inner@ {
+        myRun <!REDUNDANT_LABEL_WARNING!>middle@<!> {
+            x.myLet <!REDUNDANT_LABEL_WARNING!>inner@<!> {
                 if (it == null) {
                     y = 42
                     return@outer Unit
@@ -50,8 +50,8 @@ fun threeLevelsReturnNoInitialization(x: Int?): Int? {
 fun threeLevelsReturnWithInitialization(x: Int?): Int? {
     val y: Int
     myRun outer@ {
-        myRun middle@ {
-            x.myLet inner@ {
+        myRun <!REDUNDANT_LABEL_WARNING!>middle@<!> {
+            x.myLet <!REDUNDANT_LABEL_WARNING!>inner@<!> {
                 if (it == null) {
                     y = 42
                     return@outer Unit
@@ -69,8 +69,8 @@ fun threeLevelsReturnWithInitialization(x: Int?): Int? {
 fun threeLevelsReturnWithUnknown(x: Int?): Int? {
     val y: Int
     myRun outer@ {
-        unknownRun middle@ {
-            x.myLet inner@ {
+        unknownRun <!REDUNDANT_LABEL_WARNING!>middle@<!> {
+            x.myLet <!REDUNDANT_LABEL_WARNING!>inner@<!> {
                 if (it == null) {
                     y = 42
                     return@outer Unit

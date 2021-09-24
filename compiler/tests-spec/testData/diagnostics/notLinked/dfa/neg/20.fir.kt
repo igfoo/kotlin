@@ -9,7 +9,7 @@
  */
 fun case_1(x: Boolean?) {
     l1@ while (true) {
-        l2@ while (true || x as Boolean) {
+        <!REDUNDANT_LABEL_WARNING!>l2@<!> while (true || x as Boolean) {
             break@l1
         }
     }
@@ -25,7 +25,7 @@ fun case_1(x: Boolean?) {
  */
 fun case_2(x: Boolean?) {
     l1@ while (true) {
-        l2@ do {
+        <!REDUNDANT_LABEL_WARNING!>l2@<!> do {
             break@l1
         } while (true || x as Boolean)
     }
@@ -41,7 +41,7 @@ fun case_2(x: Boolean?) {
  */
 fun case_3(x: Boolean?) {
     l1@ do {
-        l2@ do {
+        <!REDUNDANT_LABEL_WARNING!>l2@<!> do {
             break@l1
         } while (true || x as Boolean)
     } while (true)
@@ -57,7 +57,7 @@ fun case_3(x: Boolean?) {
  */
 fun case_4(x: Boolean?) {
     l1@ do {
-        l2@ do {
+        <!REDUNDANT_LABEL_WARNING!>l2@<!> do {
             break@l1
         } while (x as Boolean)
     } while (true)
@@ -68,7 +68,7 @@ fun case_4(x: Boolean?) {
 
 // TESTCASE NUMBER: 5
 fun case_5(x: Boolean?) {
-    l1@ do {
+    <!REDUNDANT_LABEL_WARNING!>l1@<!> do {
         l2@ do {
             break@l2
         } while (x as Boolean)
@@ -81,7 +81,7 @@ fun case_5(x: Boolean?) {
 // TESTCASE NUMBER: 6
 fun case_6(x: Boolean?) {
     l1@ do {
-        l2@ do {
+        <!REDUNDANT_LABEL_WARNING!>l2@<!> do {
             break@l1
         } while (true)
     } while (x as Boolean)
@@ -92,7 +92,7 @@ fun case_6(x: Boolean?) {
 
 // TESTCASE NUMBER: 7
 fun case_7(x: Boolean?) {
-    l1@ while (true) {
+    <!REDUNDANT_LABEL_WARNING!>l1@<!> while (true) {
         l2@ while (true || x as Boolean) {
             break@l2
         }
@@ -108,7 +108,7 @@ fun case_7(x: Boolean?) {
  * ISSUES: KT-28489
  */
 fun case_8(x: Boolean?) {
-    l1@ while (true || x as Boolean) {
+    <!REDUNDANT_LABEL_WARNING!>l1@<!> while (true || x as Boolean) {
         l2@ while (true) {
             break@l2
         }
@@ -122,7 +122,7 @@ fun case_8(x: Boolean?) {
 fun case_9(x: Boolean?) {
     l1@ while (true) {
         break@l1
-        l2@ while (x as Boolean) {
+        <!REDUNDANT_LABEL_WARNING!>l2@<!> while (x as Boolean) {
 
         }
     }
@@ -138,7 +138,7 @@ fun case_9(x: Boolean?) {
  */
 fun case_10(x: Boolean?) {
     l1@ while (true) {
-        l2@ while (break@l1 || x as Boolean) {
+        <!REDUNDANT_LABEL_WARNING!>l2@<!> while (break@l1 || x as Boolean) {
 
         }
     }
@@ -150,7 +150,7 @@ fun case_10(x: Boolean?) {
 // TESTCASE NUMBER: 11
 fun case_11(x: Boolean?) {
     l1@ while (true) {
-        l2@ while (break@l1 && x as Boolean) {
+        <!REDUNDANT_LABEL_WARNING!>l2@<!> while (break@l1 && x as Boolean) {
 
         }
     }
@@ -215,9 +215,9 @@ fun case_16(x: Boolean?) {
  * ISSUES: KT-28489
  */
 fun case_17(x: Boolean?) {
-    l1@ while (true) {
+    <!REDUNDANT_LABEL_WARNING!>l1@<!> while (true) {
         l2@ while (true) {
-            l3@ while (break@l2 || x as Boolean) {
+            <!REDUNDANT_LABEL_WARNING!>l3@<!> while (break@l2 || x as Boolean) {
 
             }
         }
@@ -235,8 +235,8 @@ fun case_17(x: Boolean?) {
  */
 fun case_18(x: Boolean?) {
     l1@ while (true) {
-        l2@ while (true) {
-            l3@ while (break@l1 || x as Boolean) {
+        <!REDUNDANT_LABEL_WARNING!>l2@<!> while (true) {
+            <!REDUNDANT_LABEL_WARNING!>l3@<!> while (break@l1 || x as Boolean) {
 
             }
         }
@@ -249,8 +249,8 @@ fun case_18(x: Boolean?) {
 // TESTCASE NUMBER: 19
 fun case_19(x: Boolean?) {
     l1@ while (true) {
-        l2@ while (true) {
-            l3@ while (break@l1 && x as Boolean) {
+        <!REDUNDANT_LABEL_WARNING!>l2@<!> while (true) {
+            <!REDUNDANT_LABEL_WARNING!>l3@<!> while (break@l1 && x as Boolean) {
 
             }
         }
@@ -262,9 +262,9 @@ fun case_19(x: Boolean?) {
 
 // TESTCASE NUMBER: 20
 fun case_20(x: Boolean?) {
-    l1@ while (true) {
+    <!REDUNDANT_LABEL_WARNING!>l1@<!> while (true) {
         l2@ while (true) {
-            l3@ while (break@l2 && x as Boolean) {
+            <!REDUNDANT_LABEL_WARNING!>l3@<!> while (break@l2 && x as Boolean) {
 
             }
         }
@@ -298,7 +298,7 @@ fun case_22(x: Boolean?) {
 // TESTCASE NUMBER: 23
 fun case_23(x: Boolean?) {
     l1@ for (i in listOf(1, 2, 3)) {
-        l2@ for (j in listOf(1, 2, 3)) {
+        <!REDUNDANT_LABEL_WARNING!>l2@<!> for (j in listOf(1, 2, 3)) {
             break@l1 || x as Boolean
         }
     }
@@ -310,7 +310,7 @@ fun case_23(x: Boolean?) {
 // TESTCASE NUMBER: 24
 fun case_24(x: Boolean?) {
     l1@ for (i in listOf(1, 2, 3)) {
-        l2@ for (j in listOf(1, 2, 3)) {
+        <!REDUNDANT_LABEL_WARNING!>l2@<!> for (j in listOf(1, 2, 3)) {
             true || x as Boolean
             break@l1
         }
@@ -323,7 +323,7 @@ fun case_24(x: Boolean?) {
 // TESTCASE NUMBER: 25
 fun case_25(x: Boolean?) {
     l1@ for (i in listOf(1, 2, 3)) {
-        l2@ for (j in listOf(true || x as Boolean, break@l1 || x as Boolean, x as Boolean)) {
+        <!REDUNDANT_LABEL_WARNING!>l2@<!> for (j in listOf(true || x as Boolean, break@l1 || x as Boolean, x as Boolean)) {
             break@l1
         }
     }

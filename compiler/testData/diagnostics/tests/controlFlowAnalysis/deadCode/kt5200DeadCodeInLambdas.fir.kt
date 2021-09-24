@@ -1,7 +1,7 @@
 //KT-5200 Mark unreachable code in lambdas
 
 fun test1(): String {
-    doCall local@ {
+    doCall <!REDUNDANT_LABEL_WARNING!>local@<!> {
         throw NullPointerException()
         <!UNREACHABLE_CODE!>"b3"<!> //unmarked
     }

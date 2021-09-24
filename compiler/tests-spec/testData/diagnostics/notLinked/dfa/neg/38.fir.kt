@@ -11,7 +11,7 @@ fun case_1() {
     var x: String? = null
 
     outer@ while (true) {
-        inner@ while (x == null) {
+        <!REDUNDANT_LABEL_WARNING!>inner@<!> while (x == null) {
             break@outer
         }
     }
@@ -28,7 +28,7 @@ fun case_2() {
     var x: String? = null
 
     outer@ while (true) {
-        inner@ while (x === null) {
+        <!REDUNDANT_LABEL_WARNING!>inner@<!> while (x === null) {
             break@outer
         }
     }
@@ -45,7 +45,7 @@ fun case_3(y: Nothing?) {
     var x: String? = null
 
     outer@ while (true) {
-        inner@ while (x === y) {
+        <!REDUNDANT_LABEL_WARNING!>inner@<!> while (x === y) {
             break@outer
         }
     }
@@ -62,8 +62,8 @@ fun case_4(y: Nothing?) {
     var x: String? = null
 
     outer1@ while (true) {
-        outer2@ while (x == y) {
-            inner@ while (true) {
+        <!REDUNDANT_LABEL_WARNING!>outer2@<!> while (x == y) {
+            <!REDUNDANT_LABEL_WARNING!>inner@<!> while (true) {
                 break@outer1
             }
         }
@@ -77,7 +77,7 @@ fun case_5(y: Nothing?) {
     var x: String? = null
 
     outer@ while (x == null) {
-        inner@ while (true) {
+        <!REDUNDANT_LABEL_WARNING!>inner@<!> while (true) {
             break@outer
         }
     }
@@ -89,9 +89,9 @@ fun case_5(y: Nothing?) {
 fun case_6(y: Nothing?) {
     var x: String? = null
 
-    outer1@ while (true) {
+    <!REDUNDANT_LABEL_WARNING!>outer1@<!> while (true) {
         outer2@ while (x == y) {
-            inner@ while (true) {
+            <!REDUNDANT_LABEL_WARNING!>inner@<!> while (true) {
                 break@outer2
             }
         }
@@ -110,7 +110,7 @@ fun case_7() {
     var x: String? = null
 
     outer@ do {
-        inner@ do {
+        <!REDUNDANT_LABEL_WARNING!>inner@<!> do {
             break@outer
         } while (x == null)
     } while (true)
@@ -127,8 +127,8 @@ fun case_8(y: Nothing?) {
     var x: String? = null
 
     outer1@ do {
-        outer2@ do {
-            inner@ do {
+        <!REDUNDANT_LABEL_WARNING!>outer2@<!> do {
+            <!REDUNDANT_LABEL_WARNING!>inner@<!> do {
                 break@outer1
             } while (true)
         } while (x === y)
@@ -141,8 +141,8 @@ fun case_8(y: Nothing?) {
 fun case_9() {
     var x: String? = null
 
-    outer@ while (x != null) {
-        inner@ do {
+    <!REDUNDANT_LABEL_WARNING!>outer@<!> while (x != null) {
+        <!REDUNDANT_LABEL_WARNING!>inner@<!> do {
             x = null
         } while (<!SENSELESS_COMPARISON!>x != null<!>)
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.String? & kotlin.Nothing?")!>x<!>
@@ -154,8 +154,8 @@ fun case_9() {
 fun case_10() {
     var x: String? = null
 
-    outer@ while (x != null) {
-        inner@ do {
+    <!REDUNDANT_LABEL_WARNING!>outer@<!> while (x != null) {
+        <!REDUNDANT_LABEL_WARNING!>inner@<!> do {
             x = null
         } while (true)
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.String? & kotlin.Nothing?")!>x<!>
@@ -167,8 +167,8 @@ fun case_10() {
 fun case_11() {
     var x: String? = null
 
-    outer@ while (x != null) {
-        inner@ do {
+    <!REDUNDANT_LABEL_WARNING!>outer@<!> while (x != null) {
+        <!REDUNDANT_LABEL_WARNING!>inner@<!> do {
             x = null
             break
         } while (<!SENSELESS_COMPARISON!>x == null<!>)
