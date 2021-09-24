@@ -35,7 +35,7 @@ import org.jetbrains.kotlin.psi.KtDeclaration
 
 object RedundantVisibilityModifierSyntaxChecker : FirDeclarationSyntaxChecker<FirDeclaration, KtDeclaration>() {
 
-    override fun checkLightTree(
+    override fun checkPsiOrLightTree(
         element: FirDeclaration,
         source: FirSourceElement,
         context: CheckerContext,
