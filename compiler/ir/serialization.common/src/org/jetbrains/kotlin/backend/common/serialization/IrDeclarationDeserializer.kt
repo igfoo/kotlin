@@ -27,8 +27,6 @@ import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.types.impl.*
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.protobuf.CodedInputStream
-import org.jetbrains.kotlin.protobuf.ExtensionRegistryLite
 import org.jetbrains.kotlin.types.Variance
 import kotlin.collections.set
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrAnonymousInit as ProtoAnonymousInit
@@ -61,7 +59,7 @@ class IrDeclarationDeserializer(
     builtIns: IrBuiltIns,
     private val symbolTable: SymbolTable,
     val irFactory: IrFactory,
-    private val fileReader: IrLibraryFile,
+    private val libraryFile: IrLibraryFile,
     private val parent: IrDeclarationParent,
     val allowErrorNodes: Boolean,
     private val deserializeInlineFunctions: Boolean,
@@ -81,7 +79,7 @@ class IrDeclarationDeserializer(
         builtIns,
         allowErrorNodes,
         irFactory,
-        fileReader,
+        libraryFile,
         this,
         statementOriginIndex + additionalStatementOriginIndex,
         allowErrorStatementOrigins,
@@ -89,18 +87,13 @@ class IrDeclarationDeserializer(
     )
 
     private fun deserializeName(index: Int): Name {
-        val name = fileReader.deserializeString(index)
+        val name = libraryFile.string(index)
         return Name.guessByFirstCharacter(name)
     }
 
     private val irTypeCache = mutableMapOf<Int, IrType>()
 
-    private fun readType(index: Int): CodedInputStream =
-        fileReader.type(index).codedInputStream
-
-    private fun loadTypeProto(index: Int): ProtoType {
-        return ProtoType.parseFrom(readType(index), extensionRegistry)
-    }
+    private fun loadTypeProto(index: Int): ProtoType = libraryFile.type(index)
 
     fun deserializeNullableIrType(index: Int): IrType? = if (index == -1) null else deserializeIrType(index)
 
@@ -484,16 +477,9 @@ class IrDeclarationDeserializer(
         }
     }
 
-    private fun readBody(index: Int): CodedInputStream =
-        fileReader.body(index).codedInputStream
+    private fun loadStatementBodyProto(index: Int): ProtoStatement = libraryFile.statementBody(index)
 
-    private fun loadStatementBodyProto(index: Int): ProtoStatement {
-        return ProtoStatement.parseFrom(readBody(index), extensionRegistry)
-    }
-
-    private fun loadExpressionBodyProto(index: Int): ProtoExpression {
-        return ProtoExpression.parseFrom(readBody(index), extensionRegistry)
-    }
+    private fun loadExpressionBodyProto(index: Int): ProtoExpression = libraryFile.expressionBody(index)
 
     fun deserializeExpressionBody(index: Int): IrExpressionBody {
         return irFactory.createExpressionBody(
@@ -753,12 +739,10 @@ class IrDeclarationDeserializer(
         private val allKnownStatementOrigins = IrStatementOrigin::class.nestedClasses.toList()
         private val statementOriginIndex =
             allKnownStatementOrigins.mapNotNull { it.objectInstance as? IrStatementOriginImpl }.associateBy { it.debugName }
-
-        private val extensionRegistry = ExtensionRegistryLite.newInstance()
     }
 
     fun deserializeIrDeclarationOrigin(protoName: Int): IrDeclarationOriginImpl {
-        val originName = fileReader.deserializeString(protoName)
+        val originName = libraryFile.string(protoName)
         return declarationOriginIndex[originName] ?: object : IrDeclarationOriginImpl(originName) {}
     }
 

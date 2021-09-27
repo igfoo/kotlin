@@ -32,6 +32,13 @@ import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.load.kotlin.header.KotlinClassHeader
 import org.jetbrains.kotlin.metadata.jvm.deserialization.SerializedIrVersion
 import org.jetbrains.kotlin.protobuf.ByteString
+import org.jetbrains.kotlin.backend.common.serialization.proto.IdSignature as ProtoIdSignature
+import org.jetbrains.kotlin.backend.common.serialization.proto.IrConstructorCall as ProtoConstructorCall
+import org.jetbrains.kotlin.backend.common.serialization.proto.IrDeclaration as ProtoIrDeclaration
+import org.jetbrains.kotlin.backend.common.serialization.proto.IrExpression as ProtoExpression
+import org.jetbrains.kotlin.backend.common.serialization.proto.IrFile as ProtoFile
+import org.jetbrains.kotlin.backend.common.serialization.proto.IrStatement as ProtoStatement
+import org.jetbrains.kotlin.backend.common.serialization.proto.IrType as ProtoType
 
 fun deserializeClassFromByteArray(
     serializedIr: KotlinClassHeader.SerializedIrData,
@@ -44,7 +51,7 @@ fun deserializeClassFromByteArray(
     val byteArray = serializedIr.bytes
     val irBuiltIns = stubGenerator.irBuiltIns
     val symbolTable = stubGenerator.symbolTable
-    val irProto = JvmIr.JvmIrClass.parseFrom(byteArray)
+    val irProto = JvmIr.JvmIrClass.parseFrom(byteArray.codedInputStream)
     val irLibraryFile = IrLibraryFileFromAnnotation(
         irProto.auxTables.typeList,
         irProto.auxTables.signatureList,
@@ -104,7 +111,7 @@ fun deserializeIrFileFromByteArray(
     val byteArray = serializedIr.bytes
     val irBuiltIns = stubGenerator.irBuiltIns
     val symbolTable = stubGenerator.symbolTable
-    val irProto = JvmIr.JvmIrFile.parseFrom(byteArray)
+    val irProto = JvmIr.JvmIrFile.parseFrom(byteArray.codedInputStream)
     val irLibraryFile = IrLibraryFileFromAnnotation(
         irProto.auxTables.typeList,
         irProto.auxTables.signatureList,
@@ -157,21 +164,32 @@ fun deserializeIrFileFromByteArray(
 }
 
 private class IrLibraryFileFromAnnotation(
-    private val types: List<ByteString>,
-    private val signatures: List<ByteString>,
-    private val strings: List<ByteString>,
-    private val bodies: List<ByteString>,
-    private val debugInfo: List<ByteString>
+    private val types: List<ProtoType>,
+    private val signatures: List<ProtoIdSignature>,
+    private val strings: List<String>,
+    private val bodies: List<JvmIr.XStatementOrExpression>,
+    private val debugInfo: List<String>
 ) : IrLibraryFile() {
-    override fun irDeclaration(index: Int): ByteArray {
+    override fun declaration(index: Int): ProtoIrDeclaration {
         error("This method is never supposed to be called")
     }
 
-    override fun type(index: Int): ByteArray = types[index].toByteArray()
-    override fun signature(index: Int): ByteArray = signatures[index].toByteArray()
-    override fun string(index: Int): ByteArray = strings[index].toByteArray()
-    override fun body(index: Int): ByteArray = bodies[index].toByteArray()
-    override fun debugInfo(index: Int): ByteArray = debugInfo[index].toByteArray()
+    override fun type(index: Int): ProtoType = types[index]
+    override fun signature(index: Int): ProtoIdSignature = signatures[index]
+    override fun string(index: Int): String = strings[index]
+    override fun debugInfo(index: Int): String? = debugInfo[index]
+
+    override fun expressionBody(index: Int): ProtoExpression {
+        val xStatementOrExpression = bodies[index]
+        require(xStatementOrExpression.hasExpression())
+        return xStatementOrExpression.expression
+    }
+
+    override fun statementBody(index: Int): ProtoStatement {
+        val xStatementOrExpression = bodies[index]
+        require(xStatementOrExpression.hasStatement())
+        return xStatementOrExpression.statement
+    }
 }
 
 private fun referencePublicSymbol(

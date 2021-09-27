@@ -18,7 +18,6 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.util.IrMessageLogger
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
-import org.jetbrains.kotlin.protobuf.ByteString
 
 class JvmIrSerializerSession(
     messageLogger: IrMessageLogger,
@@ -68,11 +67,11 @@ class JvmIrSerializerSession(
 
     private fun serializeAuxTables(): JvmIr.AuxTables {
         val proto = JvmIr.AuxTables.newBuilder()
-        protoTypeArray.forEach { proto.addType(it.toByteString()) }
-        protoIdSignatureArray.forEach { proto.addSignature(it.toByteString()) }
-        protoStringArray.forEach { proto.addString(ByteString.copyFromUtf8(it)) }
-        protoBodyArray.forEach { proto.addBody(ByteString.copyFrom(it.toByteArray())) }
-        protoDebugInfoArray.forEach { proto.addDebugInfo(ByteString.copyFromUtf8(it)) }
+        protoTypeArray.forEach(proto::addType)
+        protoIdSignatureArray.forEach(proto::addSignature)
+        protoStringArray.forEach(proto::addString)
+        protoBodyArray.forEach { proto.addBody(it.toProto()) }
+        protoDebugInfoArray.forEach(proto::addDebugInfo)
         return proto.build()
     }
 
@@ -125,6 +124,11 @@ class JvmIrSerializerSession(
         private val DescriptorVisibility.visibleFromOtherFiles
             get() = isPublicAPI ||
                     this == DescriptorVisibilities.INTERNAL
+    }
+
+    fun XStatementOrExpression.toProto(): JvmIr.XStatementOrExpression = when (this) {
+        is XStatementOrExpression.XStatement -> JvmIr.XStatementOrExpression.newBuilder().setStatement(toProtoStatement()).build()
+        is XStatementOrExpression.XExpression -> JvmIr.XStatementOrExpression.newBuilder().setExpression(toProtoExpression()).build()
     }
 }
 
