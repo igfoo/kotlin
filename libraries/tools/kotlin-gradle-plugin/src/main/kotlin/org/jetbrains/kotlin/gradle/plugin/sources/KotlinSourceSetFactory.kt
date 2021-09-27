@@ -101,7 +101,15 @@ internal class DefaultKotlinSourceSetFactory(
                 }
 
                 project.whenEvaluated {
-                    setJsCompilerIfNecessary(sourceSet, this@apply)
+                    if (!project.extensions.extraProperties.has("kotlin.js.targets.exist")) {
+                        project.extensions.extraProperties["kotlin.js.targets.exist"] = project.kotlinExtension
+                            .targets
+                            .any { it is KotlinJsIrTarget || it is KotlinJsTarget }
+                    }
+
+                    if (project.extensions.extraProperties["kotlin.js.targets.exist"] == true) {
+                        setJsCompilerIfNecessary(sourceSet, this@apply)
+                    }
                 }
             }
         }
