@@ -74,15 +74,14 @@ abstract class FirAbstractTreeTransformerWithSuperTypes(
                     scopes.add(scope)
                 }
             }
+            session.nestedClassifierScope(firClass)?.let(scopes::add)
             if (firClass is FirRegularClass) {
-                firClass.addTypeParametersScope()
                 val companionObject = firClass.companionObject
                 if (companionObject != null) {
                     session.nestedClassifierScope(companionObject)?.let(scopes::add)
                 }
+                firClass.addTypeParametersScope()
             }
-
-            session.nestedClassifierScope(firClass)?.let(scopes::add)
 
             // Note that annotations are still visited here
             // again, although there's no need in it
