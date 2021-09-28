@@ -31,13 +31,13 @@ import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.types.builder.buildResolvedTypeRef
 import org.jetbrains.kotlin.fir.types.impl.ConeClassLikeTypeImpl
 import org.jetbrains.kotlin.fir.types.impl.ConeTypeParameterTypeImpl
-import org.jetbrains.kotlin.lexer.KtTokens.CLOSING_QUOTE
-import org.jetbrains.kotlin.lexer.KtTokens.OPEN_QUOTE
+import org.jetbrains.kotlin.lexer.KtTokens.*
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.parsing.*
+import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtPsiUtil
 import org.jetbrains.kotlin.types.ConstantValueKind
 import org.jetbrains.kotlin.util.OperatorNameConventions
@@ -130,6 +130,14 @@ abstract class BaseFirBuilder<T>(val baseSession: FirSession, val context: Conte
         }
 
     fun currentDispatchReceiverType(): ConeClassLikeType? = currentDispatchReceiverType(context)
+
+    /**
+     * @return second from the end dispatch receiver. For the inner class constructor it would be the outer class.
+     */
+    protected fun dispatchReceiverForInnerClassConstructor(): ConeClassLikeType? {
+        val outerClassIndex = context.dispatchReceiverTypesStack.lastIndex - 1
+        return context.dispatchReceiverTypesStack.getOrNull(outerClassIndex)
+    }
 
     fun callableIdForClassConstructor() =
         if (context.className == FqName.ROOT) CallableId(context.packageFqName, Name.special("<anonymous-init>"))
