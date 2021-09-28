@@ -19,7 +19,7 @@ import kotlin.internal.RequireKotlinVersionKind
  *
  * It's recommended to propagate the experimental status to the API that depends on unsigned types by annotating it with this annotation.
  */
-@Suppress("DEPRECATION")
+@Suppress("DEPRECATION_ERROR")
 @Experimental(level = Experimental.Level.WARNING)
 @RequiresOptIn(level = RequiresOptIn.Level.WARNING)
 @MustBeDocumented
