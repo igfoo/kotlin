@@ -251,7 +251,7 @@ abstract class BaseGradleIT {
         val useClasspathSnapshot: Boolean? = null,
         val withBuildCache: Boolean = false,
         val kaptOptions: KaptOptions? = null,
-        val parallelTasksInProject: Boolean = false,
+        val parallelTasksInProject: Boolean = true,
         val jsCompilerType: KotlinJsCompilerType? = null,
         val configurationCache: Boolean = false,
         val configurationCacheProblems: ConfigurationCacheProblems = ConfigurationCacheProblems.FAIL,
