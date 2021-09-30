@@ -371,7 +371,7 @@ fun main(args: Array<String>) {
     generateTestGroupSuiteWithJUnit5 {
         testGroup("plugins/fir/fir-plugin-prototype/tests-gen", "plugins/fir/fir-plugin-prototype/testData") {
             testClass<AbstractFirAllOpenDiagnosticTest> {
-                model("")
+                model("diagnostics")
             }
         }
     }
