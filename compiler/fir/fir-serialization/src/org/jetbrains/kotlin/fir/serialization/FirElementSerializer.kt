@@ -23,6 +23,8 @@ import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.expressions.FirNamedArgumentExpression
 import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotation
 import org.jetbrains.kotlin.fir.expressions.impl.FirEmptyAnnotationArgumentMapping
+import org.jetbrains.kotlin.fir.extensions.extensionService
+import org.jetbrains.kotlin.fir.extensions.typeAttributeExtensions
 import org.jetbrains.kotlin.fir.resolve.*
 import org.jetbrains.kotlin.fir.resolve.calls.varargElementType
 import org.jetbrains.kotlin.fir.resolve.inference.isSuspendFunctionType
@@ -606,9 +608,16 @@ class FirElementSerializer private constructor(
     fun typeId(type: ConeKotlinType): Int = typeTable[typeProto(type)]
 
     private fun typeProto(typeRef: FirTypeRef, toSuper: Boolean = false): ProtoBuf.Type.Builder {
-        return typeProto(typeRef.coneType, toSuper, correspondingTypeRef = typeRef).also {
-            for (annotation in typeRef.annotations) {
-                extension.serializeTypeAnnotation(annotation, it)
+        val coneType = typeRef.coneType
+        return typeProto(coneType, toSuper, correspondingTypeRef = typeRef).also { typeProto ->
+            for (annotation in coneType.attributes.customAnnotations) {
+                extension.serializeTypeAnnotation(annotation, typeProto)
+            }
+            for (attributeExtension in session.extensionService.typeAttributeExtensions) {
+                for (attribute in coneType.attributes) {
+                    val annotation = attributeExtension.convertAttributeToAnnotation(attribute) ?: continue
+                    extension.serializeTypeAnnotation(annotation, typeProto)
+                }
             }
         }
     }
