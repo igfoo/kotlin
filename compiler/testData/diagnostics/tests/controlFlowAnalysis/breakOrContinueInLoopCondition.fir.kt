@@ -1,10 +1,10 @@
 fun test() {
 
-    <!REDUNDANT_LABEL_WARNING!>l@<!> for (i in if (true) 1..10 else <!BREAK_OR_CONTINUE_OUTSIDE_A_LOOP!>continue@l<!>) {}
+    l@ for (i in if (true) 1..10 else <!BREAK_OR_CONTINUE_OUTSIDE_A_LOOP!>continue@l<!>) {}
     for (i in if (true) 1..10 else <!BREAK_OR_CONTINUE_OUTSIDE_A_LOOP!>continue<!>) {}
 
     while (<!BREAK_OR_CONTINUE_OUTSIDE_A_LOOP!>break<!>) {}
-    <!REDUNDANT_LABEL_WARNING!>l@<!> while (<!BREAK_OR_CONTINUE_OUTSIDE_A_LOOP!>break@l<!>) {}
+    l@ while (<!BREAK_OR_CONTINUE_OUTSIDE_A_LOOP!>break@l<!>) {}
 
     do {} while (continue)
     l@ do {} while (continue@l)

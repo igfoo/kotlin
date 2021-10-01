@@ -22,7 +22,9 @@ import org.jetbrains.kotlin.fir.analysis.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.declarations.utils.effectiveVisibility
 import org.jetbrains.kotlin.fir.declarations.utils.effectiveVisibilityOrNull
+import org.jetbrains.kotlin.fir.diagnostics.ConeJumpOutsideLoopError
 import org.jetbrains.kotlin.fir.diagnostics.ConeNotAFunctionLabelError
+import org.jetbrains.kotlin.fir.diagnostics.ConeNotALoopLabelError
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.references.FirThisReference
 import org.jetbrains.kotlin.fir.symbols.impl.FirAnonymousFunctionSymbol
@@ -195,9 +197,14 @@ object FirRedundantLabelChecker : FirDeclarationSyntaxChecker<FirDeclaration, Ps
             private fun visitLoopJumpImpl(loopJump: FirLoopJump) {
                 if (!loopJump.isLabeled) return
                 val target = loopJump.target
-                val referencedLoop = target.labeledElement as? FirLoop
-                val label = referencedLoop?.label ?: return
-                action(label)
+                when (val labeledElement = target.labeledElement) {
+                    is FirErrorLoop -> when (val diagnostic = labeledElement.diagnostic) {
+                        is ConeJumpOutsideLoopError -> diagnostic.label?.let(action)
+                        is ConeNotALoopLabelError -> diagnostic.label?.let(action)
+                        else -> {}
+                    }
+                    else -> labeledElement.label?.let(action)
+                }
             }
 
             override fun visitThisReference(thisReference: FirThisReference) {

@@ -2,7 +2,7 @@ class C {
 
     fun f (a : Boolean, b : Boolean) {
         b@ while (true)
-          <!REDUNDANT_LABEL_WARNING!>a@<!> {
+          a@ {
             <!NOT_A_LOOP_LABEL!>break@f<!>
             break
             break@b
@@ -12,7 +12,7 @@ class C {
         <!BREAK_OR_CONTINUE_OUTSIDE_A_LOOP!>continue<!>
 
         b@ while (true)
-          <!REDUNDANT_LABEL_WARNING!>a@<!> {
+          a@ {
             <!NOT_A_LOOP_LABEL!>continue@f<!>
             continue
             continue@b
@@ -84,7 +84,7 @@ class C {
     }
 
     fun twoLabelsOnLoop() {
-        <!REDUNDANT_LABEL_WARNING!>label1@<!> label2@ for (i in 1..100) {
+        label1@ label2@ for (i in 1..100) {
             if (i > 0) {
                 <!NOT_A_LOOP_LABEL!>break@label1<!>
             }

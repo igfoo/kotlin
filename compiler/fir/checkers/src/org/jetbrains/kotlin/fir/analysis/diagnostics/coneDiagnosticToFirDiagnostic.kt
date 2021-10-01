@@ -112,6 +112,8 @@ private fun ConeDiagnostic.toFirDiagnostic(
         runIf(variable.isLocalMember) { FirErrors.VARIABLE_WITH_NO_TYPE_NO_INITIALIZER.createOn(source) }
     is ConeUnderscoreIsReserved -> FirErrors.UNDERSCORE_IS_RESERVED.createOn(this.source)
     is ConeUnderscoreUsageWithoutBackticks -> FirErrors.UNDERSCORE_USAGE_WITHOUT_BACKTICKS.createOn(this.source)
+    is ConeJumpOutsideLoopError -> FirErrors.BREAK_OR_CONTINUE_OUTSIDE_A_LOOP.createOn(source)
+    is ConeNotALoopLabelError -> FirErrors.NOT_A_LOOP_LABEL.createOn(source)
     else -> throw IllegalArgumentException("Unsupported diagnostic type: ${this.javaClass}")
 }
 
@@ -381,8 +383,6 @@ private fun ConeSimpleDiagnostic.getFactory(source: FirSourceElement): FirDiagno
             KtNodeTypes.WHEN_CONDITION_IN_RANGE, KtNodeTypes.WHEN_CONDITION_IS_PATTERN -> FirErrors.EXPECTED_CONDITION
             else -> FirErrors.EXPRESSION_EXPECTED
         }
-        DiagnosticKind.JumpOutsideLoop -> FirErrors.BREAK_OR_CONTINUE_OUTSIDE_A_LOOP
-        DiagnosticKind.NotLoopLabel -> FirErrors.NOT_A_LOOP_LABEL
         DiagnosticKind.VariableExpected -> FirErrors.VARIABLE_EXPECTED
         DiagnosticKind.ValueParameterWithNoTypeAnnotation -> FirErrors.VALUE_PARAMETER_WITH_NO_TYPE_ANNOTATION
         DiagnosticKind.CannotInferParameterType -> FirErrors.CANNOT_INFER_PARAMETER_TYPE

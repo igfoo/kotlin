@@ -29,11 +29,19 @@ class ConeNotAFunctionLabelError(val label: FirLabel) : ConeDiagnostic {
         get() = "'$label' is not a function label"
 }
 
+class ConeNotALoopLabelError(val label: FirLabel?) : ConeDiagnostic {
+    override val reason: String
+        get() = "Not a loop label"
+}
+
+class ConeJumpOutsideLoopError(val label: FirLabel?) : ConeDiagnostic {
+    override val reason: String
+        get() = "Jump out of a loop"
+}
+
 enum class DiagnosticKind {
     Syntax,
     ExpressionExpected,
-    NotLoopLabel,
-    JumpOutsideLoop,
     VariableExpected,
 
     ReturnNotAllowed,

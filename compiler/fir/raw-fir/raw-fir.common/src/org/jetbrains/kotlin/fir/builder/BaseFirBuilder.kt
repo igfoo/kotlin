@@ -250,7 +250,7 @@ abstract class BaseFirBuilder<T>(val baseSession: FirSession, val context: Conte
                 bind(
                     buildErrorLoop(
                         sourceElement,
-                        ConeSimpleDiagnostic("Cannot bind unlabeled jump to a loop", DiagnosticKind.JumpOutsideLoop)
+                        ConeJumpOutsideLoopError(null)
                     )
                 )
             }
@@ -263,13 +263,15 @@ abstract class BaseFirBuilder<T>(val baseSession: FirSession, val context: Conte
                 }
             }
             target = FirLoopTarget(labelName).apply {
+                val label = context.firLabels.lastOrNull { it.name == labelName }
                 bind(
                     buildErrorLoop(
                         sourceElement,
-                        ConeSimpleDiagnostic(
-                            "Cannot bind label $labelName to a loop",
-                            lastLoopTarget?.let { DiagnosticKind.NotLoopLabel } ?: DiagnosticKind.JumpOutsideLoop
-                        )
+                        if (lastLoopTarget == null) {
+                            ConeJumpOutsideLoopError(label)
+                        } else {
+                            ConeNotALoopLabelError(label)
+                        }
                     )
                 )
             }
