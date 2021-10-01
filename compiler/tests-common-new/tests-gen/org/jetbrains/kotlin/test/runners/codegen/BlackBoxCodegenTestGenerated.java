@@ -24937,6 +24937,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
         }
 
         @Test
+        @TestMetadata("kt48648_genericFieldIeee754.kt")
+        public void testKt48648_genericFieldIeee754() throws Exception {
+            runTest("compiler/testData/codegen/box/jvmField/kt48648_genericFieldIeee754.kt");
+        }
+
+        @Test
         @TestMetadata("publicField.kt")
         public void testPublicField() throws Exception {
             runTest("compiler/testData/codegen/box/jvmField/publicField.kt");

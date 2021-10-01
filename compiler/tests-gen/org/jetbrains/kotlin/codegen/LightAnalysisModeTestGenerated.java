@@ -21021,6 +21021,11 @@ public class LightAnalysisModeTestGenerated extends AbstractLightAnalysisModeTes
             runTest("compiler/testData/codegen/box/jvmField/kt48295a.kt");
         }
 
+        @TestMetadata("kt48648_genericFieldIeee754.kt")
+        public void testKt48648_genericFieldIeee754() throws Exception {
+            runTest("compiler/testData/codegen/box/jvmField/kt48648_genericFieldIeee754.kt");
+        }
+
         @TestMetadata("publicField.kt")
         public void testPublicField() throws Exception {
             runTest("compiler/testData/codegen/box/jvmField/publicField.kt");
