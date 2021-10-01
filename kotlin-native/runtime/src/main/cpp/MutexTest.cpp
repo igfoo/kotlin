@@ -5,6 +5,7 @@
 
 #include "Mutex.hpp"
 
+#include <mutex>
 #include <thread>
 
 #include "gtest/gtest.h"
