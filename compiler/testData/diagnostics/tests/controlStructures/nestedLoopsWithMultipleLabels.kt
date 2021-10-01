@@ -1,3 +1,4 @@
+// FIR_IDENTICAL
 fun test() {
     a@ b@ while(true) {
         val f = {

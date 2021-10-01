@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.fir.analysis.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.declarations.utils.effectiveVisibility
 import org.jetbrains.kotlin.fir.declarations.utils.effectiveVisibilityOrNull
+import org.jetbrains.kotlin.fir.diagnostics.ConeNotAFunctionLabelError
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.references.FirThisReference
 import org.jetbrains.kotlin.fir.symbols.impl.FirAnonymousFunctionSymbol
@@ -174,8 +175,11 @@ object FirRedundantLabelChecker : FirDeclarationSyntaxChecker<FirDeclaration, Ps
 
             override fun visitReturnExpression(returnExpression: FirReturnExpression) {
                 if (returnExpression.isLabeled) {
-                    val referencedAnonymousFunction = returnExpression.target.labeledElement as? FirAnonymousFunction
-                    referencedAnonymousFunction?.label?.let { action(it) }
+                    when (val targetFunction = returnExpression.target.labeledElement) {
+                        is FirAnonymousFunction -> targetFunction.label?.let(action)
+                        is FirErrorFunction -> (targetFunction.diagnostic as? ConeNotAFunctionLabelError)?.let { action(it.label) }
+                        else -> {}
+                    }
                 }
                 super.visitReturnExpression(returnExpression)
             }

@@ -16,9 +16,7 @@ import org.jetbrains.kotlin.fir.declarations.builder.*
 import org.jetbrains.kotlin.fir.declarations.impl.FirDeclarationStatusImpl
 import org.jetbrains.kotlin.fir.declarations.utils.addDeclaration
 import org.jetbrains.kotlin.fir.declarations.utils.isLocal
-import org.jetbrains.kotlin.fir.diagnostics.ConeSimpleDiagnostic
-import org.jetbrains.kotlin.fir.diagnostics.ConeUnderscoreIsReserved
-import org.jetbrains.kotlin.fir.diagnostics.DiagnosticKind
+import org.jetbrains.kotlin.fir.diagnostics.*
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.expressions.builder.*
 import org.jetbrains.kotlin.fir.references.FirReference
@@ -155,16 +153,20 @@ abstract class BaseFirBuilder<T>(val baseSession: FirSession, val context: Conte
         fromKtReturnExpression: Boolean = false
     ): FirReturnExpression {
         return buildReturnExpression {
-            fun FirFunctionTarget.bindToErrorFunction(message: String, kind: DiagnosticKind) {
+            fun FirFunctionTarget.bindToErrorFunction(coneDiagnostic: ConeDiagnostic) {
                 bind(
                     buildErrorFunction {
                         source = baseSource
                         moduleData = baseModuleData
                         origin = FirDeclarationOrigin.Source
-                        diagnostic = ConeSimpleDiagnostic(message, kind)
+                        diagnostic = coneDiagnostic
                         symbol = FirErrorFunctionSymbol()
                     }
                 )
+            }
+
+            fun FirFunctionTarget.bindToErrorFunction(message: String, kind: DiagnosticKind) {
+                bindToErrorFunction(ConeSimpleDiagnostic(message, kind))
             }
 
             source =
@@ -184,8 +186,9 @@ abstract class BaseFirBuilder<T>(val baseSession: FirSession, val context: Conte
                     }
                 }
                 target = FirFunctionTarget(labelName, false).apply {
-                    if (context.firLabels.any { it.name == labelName }) {
-                        bindToErrorFunction("Label $labelName does not target a function", DiagnosticKind.NotAFunctionLabel)
+                    val label = context.firLabels.lastOrNull { it.name == labelName }
+                    if (label != null) {
+                        bindToErrorFunction(ConeNotAFunctionLabelError(label))
                     } else {
                         bindToErrorFunction("Cannot bind label $labelName to a function", DiagnosticKind.UnresolvedLabel)
                     }

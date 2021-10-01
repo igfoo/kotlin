@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir.diagnostics
 
+import org.jetbrains.kotlin.fir.FirLabel
 import org.jetbrains.kotlin.fir.FirSourceElement
 
 class ConeSimpleDiagnostic(override val reason: String, val kind: DiagnosticKind = DiagnosticKind.Other) : ConeDiagnostic
@@ -23,6 +24,11 @@ class ConeUnderscoreUsageWithoutBackticks(source: FirSourceElement) : ConeDiagno
     override val reason: String get() = "Names _, __, ___, ... can be used only in back-ticks (`_`, `__`, `___`, ...)"
 }
 
+class ConeNotAFunctionLabelError(val label: FirLabel) : ConeDiagnostic {
+    override val reason: String
+        get() = "'$label' is not a function label"
+}
+
 enum class DiagnosticKind {
     Syntax,
     ExpressionExpected,
@@ -32,7 +38,6 @@ enum class DiagnosticKind {
 
     ReturnNotAllowed,
     UnresolvedLabel,
-    NotAFunctionLabel,
     NoThis,
     IllegalConstExpression,
     IllegalSelector,
