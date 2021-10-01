@@ -9,6 +9,8 @@ import org.jetbrains.kotlin.descriptors.EffectiveVisibility
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.fir.containingClassForStaticMemberAttr
+import org.jetbrains.kotlin.fir.declarations.FirClass
+import org.jetbrains.kotlin.fir.declarations.FirClassLikeDeclaration
 import org.jetbrains.kotlin.fir.declarations.FirConstructor
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.builder.buildPrimaryConstructor
@@ -16,6 +18,9 @@ import org.jetbrains.kotlin.fir.declarations.builder.buildSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.impl.FirResolvedDeclarationStatusImpl
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationGenerationExtension
 import org.jetbrains.kotlin.fir.moduleData
+import org.jetbrains.kotlin.fir.resolve.defaultType
+import org.jetbrains.kotlin.fir.resolve.symbolProvider
+import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.ConeClassLikeLookupTagImpl
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassLikeSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirConstructorSymbol
@@ -25,6 +30,7 @@ import org.jetbrains.kotlin.fir.types.impl.ConeClassLikeTypeImpl
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 
+@OptIn(SymbolInternals::class)
 fun FirDeclarationGenerationExtension.buildMaterializeFunction(
     matchedClassSymbol: FirClassLikeSymbol<*>,
     callableId: CallableId
@@ -46,9 +52,14 @@ fun FirDeclarationGenerationExtension.buildMaterializeFunction(
         }
         name = callableId.callableName
         symbol = FirNamedFunctionSymbol(callableId)
+        dispatchReceiverType = callableId.classId?.let {
+            val firClass = session.symbolProvider.getClassLikeSymbolByClassId(it)?.fir as? FirClass
+            firClass?.defaultType()
+        }
     }
 }
 
+@OptIn(SymbolInternals::class)
 fun FirDeclarationGenerationExtension.buildConstructor(classId: ClassId, callableId: CallableId): FirConstructor {
     val lookupTag = ConeClassLikeLookupTagImpl(classId)
     return buildPrimaryConstructor {
@@ -67,6 +78,10 @@ fun FirDeclarationGenerationExtension.buildConstructor(classId: ClassId, callabl
             EffectiveVisibility.Public
         )
         symbol = FirConstructorSymbol(callableId)
+        dispatchReceiverType = callableId.classId?.let {
+            val firClass = session.symbolProvider.getClassLikeSymbolByClassId(it)?.fir as? FirClass
+            firClass?.defaultType()
+        }
     }.also {
         it.containingClassForStaticMemberAttr = lookupTag
     }
