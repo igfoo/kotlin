@@ -1,4 +1,6 @@
 FILE: typeParameterVsNested.kt
+    package test
+
     public abstract interface Some : R|kotlin/Any| {
     }
     public abstract class My<T : R|test/Some|> : R|kotlin/Any| {
