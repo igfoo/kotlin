@@ -17491,6 +17491,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
         }
 
         @Test
+        @TestMetadata("kt48648_genericField.kt")
+        public void testKt48648_genericField() throws Exception {
+            runTest("compiler/testData/codegen/box/ieee754/kt48648_genericField.kt");
+        }
+
+        @Test
         @TestMetadata("lessDouble.kt")
         public void testLessDouble() throws Exception {
             runTest("compiler/testData/codegen/box/ieee754/lessDouble.kt");
@@ -24934,12 +24940,6 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
         @TestMetadata("kt48295a.kt")
         public void testKt48295a() throws Exception {
             runTest("compiler/testData/codegen/box/jvmField/kt48295a.kt");
-        }
-
-        @Test
-        @TestMetadata("kt48648_genericFieldIeee754.kt")
-        public void testKt48648_genericFieldIeee754() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmField/kt48648_genericFieldIeee754.kt");
         }
 
         @Test

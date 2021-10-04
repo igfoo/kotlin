@@ -14480,6 +14480,11 @@ public class LightAnalysisModeTestGenerated extends AbstractLightAnalysisModeTes
             runTest("compiler/testData/codegen/box/ieee754/inline.kt");
         }
 
+        @TestMetadata("kt48648_genericField.kt")
+        public void testKt48648_genericField() throws Exception {
+            runTest("compiler/testData/codegen/box/ieee754/kt48648_genericField.kt");
+        }
+
         @TestMetadata("lessDouble.kt")
         public void testLessDouble() throws Exception {
             runTest("compiler/testData/codegen/box/ieee754/lessDouble.kt");
@@ -21019,11 +21024,6 @@ public class LightAnalysisModeTestGenerated extends AbstractLightAnalysisModeTes
         @TestMetadata("kt48295a.kt")
         public void testKt48295a() throws Exception {
             runTest("compiler/testData/codegen/box/jvmField/kt48295a.kt");
-        }
-
-        @TestMetadata("kt48648_genericFieldIeee754.kt")
-        public void testKt48648_genericFieldIeee754() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmField/kt48648_genericFieldIeee754.kt");
         }
 
         @TestMetadata("publicField.kt")
