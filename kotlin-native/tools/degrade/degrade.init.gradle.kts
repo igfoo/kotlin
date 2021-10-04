@@ -124,8 +124,12 @@ private class Degrade(val rootProject: Project) {
             if (line != "Main class = $kotlinNativeEntryPointClass"
                     && !line.startsWith("Entry point method = $kotlinNativeEntryPointClass.")) continue
 
-            val transformedArguments = generateSequence { nextLine() }
-                    .dropWhile { !it.startsWith("Transformed arguments = ") }.drop(1)
+            generateSequence(nextLine)
+                    .firstOrNull { it.startsWith("Transformed arguments = ") }
+                    .takeIf { it == "Transformed arguments = [" }
+                    ?: continue
+
+            val transformedArguments = generateSequence(nextLine)
                     .takeWhile { it != "]" }
                     .map { it.trimStart() }
                     .toList()
