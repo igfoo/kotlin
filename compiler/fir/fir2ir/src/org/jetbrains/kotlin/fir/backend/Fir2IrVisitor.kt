@@ -17,7 +17,7 @@ import org.jetbrains.kotlin.fir.declarations.builder.buildProperty
 import org.jetbrains.kotlin.fir.declarations.impl.FirDeclarationStatusImpl
 import org.jetbrains.kotlin.fir.declarations.utils.expandedConeType
 import org.jetbrains.kotlin.fir.declarations.utils.isSynthetic
-import org.jetbrains.kotlin.fir.declarations.utils.primaryConstructor
+import org.jetbrains.kotlin.fir.declarations.primaryConstructor
 import org.jetbrains.kotlin.fir.declarations.utils.visibility
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.expressions.builder.buildBlock
@@ -130,7 +130,7 @@ class Fir2IrVisitor(
         } else if (initializer is FirAnonymousObjectExpression) {
             // Otherwise, this is a default-ish enum entry, which doesn't need its own synthetic class.
             // During raw FIR building, we put the delegated constructor call inside an anonymous object.
-            val delegatedConstructor = initializer.anonymousObject.primaryConstructor?.delegatedConstructor
+            val delegatedConstructor = initializer.anonymousObject.primaryConstructor(session)?.fir?.delegatedConstructor
             if (delegatedConstructor != null) {
                 with(memberGenerator) {
                     irEnumEntry.initializerExpression = irFactory.createExpressionBody(
