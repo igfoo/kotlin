@@ -67,6 +67,12 @@ fun kt4565_2(a: SomeClass?) {
     }
 }
 
+inline fun <reified T : SomeClass> kt45345(a: SomeClass?) {
+    if (a?.data is T) {
+        <!DEBUG_INFO_SMARTCAST!>a<!>.data
+    }
+}
+
 class A(val y: Int)
 
 fun kt7491_1() {

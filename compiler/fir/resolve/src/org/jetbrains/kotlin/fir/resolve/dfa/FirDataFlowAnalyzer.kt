@@ -392,7 +392,7 @@ abstract class FirDataFlowAnalyzer<FLOW : Flow>(
                 val expressionVariable = variableStorage.createSyntheticVariable(typeOperatorCall)
                 val isNotNullCheck =
                     if (type is ConeTypeParameterType)
-                        false
+                        type.lookupTag.typeParameterSymbol.resolvedBounds.any { it.type.nullability == ConeNullability.NOT_NULL }
                     else
                         type.nullability == ConeNullability.NOT_NULL
                 val isRegularIs = operation == FirOperation.IS
