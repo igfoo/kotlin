@@ -5870,6 +5870,19 @@ fileCheckTest("filecheck_escape_analysis_disabled") {
     checkPrefix = "CHECK-DEBUG"
 }
 
+fileCheckTest("filecheck_signext_zeroext0") {
+    annotatedSource = project.file('filecheck/signext_zeroext0.kt')
+}
+
+createInterop("filecheck_signext_zeroext_interop_input") {
+    it.defFile 'filecheck/signext_zeroext_interop_input.def'
+}
+
+fileCheckTest("filecheck_signext_zeroext_interop") {
+    annotatedSource = project.file('filecheck/signext_zeroext_interop.kt')
+    interop = "filecheck_signext_zeroext_interop_input"
+}
+
 dependencies {
     nopPluginApi project(kotlinCompilerModule)
     nopPluginApi project(":native:kotlin-native-utils")
