@@ -5,43 +5,52 @@
 
 package org.jetbrains.kotlin.gradle.tasks
 
+import org.gradle.api.file.Directory
 import org.gradle.api.file.FileCollection
-import org.jetbrains.kotlin.utils.keysToMap
-import java.io.File
-import java.util.HashSet
+import org.gradle.api.file.FileSystemOperations
+import org.gradle.api.provider.Provider
 
 internal class TaskOutputsBackup(
     val outputs: FileCollection,
-    val previousOutputs: Map<File, Array<Byte>> = outputs
-        .flatMap {
-            if (it.isDirectory) {
-                it.walk().filter(File::isFile)
-            } else {
-                sequenceOf(it)
+    val localState: FileCollection,
+    val snapshotsDir: Provider<Directory>,
+    val fileSystemOperations: FileSystemOperations
+) {
+    fun createSnapshot() {
+        if (!outputs.isEmpty) {
+            fileSystemOperations.sync { spec ->
+                spec.from(outputs)
+                spec.into(snapshotsDir.map { it.dir(OUTPUTS_DIR_NAME) })
             }
         }
-        .filter { it.exists() }
-        .toSet()
-        .keysToMap { it.readBytes().toTypedArray() }
-) {
+
+        if (!localState.isEmpty) {
+            fileSystemOperations.sync { spec ->
+                spec.from(localState)
+                spec.into(snapshotsDir.map { it.dir(LOCAL_STATE_DIR_NAME) })
+            }
+        }
+    }
 
     fun restoreOutputs() {
-        outputs.forEach {
-            if (it.isDirectory) {
-                it.deleteRecursively()
-            } else if (it.isFile) {
-                it.delete()
-            }
-        }
+        fileSystemOperations.delete { it.delete(outputs, localState) }
 
-        val dirs = HashSet<File>()
-
-        for ((file, bytes) in previousOutputs) {
-            val dir = file.parentFile
-            if (dirs.add(dir)) {
-                dir.mkdirs()
-            }
-            file.writeBytes(bytes.toByteArray())
+        fileSystemOperations.sync { spec ->
+            spec.from(snapshotsDir.map { it.dir(OUTPUTS_DIR_NAME) })
+            spec.into(outputs.asPath)
         }
+        fileSystemOperations.sync { spec ->
+            spec.from(snapshotsDir.map { it.dir(LOCAL_STATE_DIR_NAME) })
+            spec.into(localState.asPath)
+        }
+    }
+
+    fun deleteSnapshot() {
+        fileSystemOperations.delete { it.delete(snapshotsDir) }
+    }
+
+    internal companion object {
+        const val OUTPUTS_DIR_NAME = "outputs"
+        const val LOCAL_STATE_DIR_NAME = "localState"
     }
 }
