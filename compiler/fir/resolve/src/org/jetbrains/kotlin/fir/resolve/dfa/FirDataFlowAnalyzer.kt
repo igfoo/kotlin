@@ -671,8 +671,9 @@ abstract class FirDataFlowAnalyzer<FLOW : Flow>(
                     )
                 }
             }
-            if (this is FirSafeCallExpression) {
-                this.receiver.propagateNotNullInfo()
+            when (this) {
+                is FirSafeCallExpression -> this.receiver.propagateNotNullInfo()
+                is FirTypeOperatorCall -> this.argument.propagateNotNullInfo()
             }
         }
 
