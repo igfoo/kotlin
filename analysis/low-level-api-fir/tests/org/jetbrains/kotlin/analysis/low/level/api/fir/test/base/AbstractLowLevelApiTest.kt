@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.platform.jvm.JvmPlatforms
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.test.InTextDirectivesUtils
 import org.jetbrains.kotlin.test.TestInfrastructureInternals
 import org.jetbrains.kotlin.test.bind
 import org.jetbrains.kotlin.test.builders.TestConfigurationBuilder
@@ -112,8 +113,9 @@ abstract class AbstractLowLevelApiTest : TestWithDisposable() {
         val ktFiles = moduleInfo.testFilesToKtFiles.filter { (testFile, _) -> !testFile.isAdditional }.values.toList()
 
         doTestByFileStructure(ktFiles, moduleStructure, testServices)
-        useDependedAnalysisSession = true
+        if (ktFiles.any { InTextDirectivesUtils.isDirectiveDefined(it.text, DISABLE_DEPENDED_MODE_DIRECTIVE) }) return
         try {
+            useDependedAnalysisSession = true
             doTestByFileStructure(ktFiles.map {
                 val fakeFile = it.copy() as KtFile
                 fakeFile.originalKtFile = it
@@ -177,5 +179,9 @@ abstract class AbstractLowLevelApiTest : TestWithDisposable() {
     }
 
     private class SkipDependedModeException : Exception()
+
+    companion object {
+        val DISABLE_DEPENDED_MODE_DIRECTIVE = "DISABLE_DEPENDED_MODE"
+    }
 }
 
