@@ -23,51 +23,6 @@ import org.jetbrains.kotlin.js.parser.parseExpressionOrStatement
 fun translateJsCodeIntoStatementList(code: IrExpression): List<JsStatement>? {
     // TODO: support proper symbol linkage and label clash resolution
 
-    fun foldString(expression: IrExpression): String? {
-        val builder = StringBuilder()
-        var foldingFailed = false
-        expression.acceptVoid(object : IrElementVisitorVoid {
-            override fun visitElement(element: IrElement) {
-                foldingFailed = true
-            }
-
-            override fun visitGetValue(expression: IrGetValue) {
-                expression.symbol.owner.acceptVoid(this)
-            }
-
-            override fun visitVariable(declaration: IrVariable) {
-                declaration.initializer?.let {
-                    it.acceptVoid(this)
-                    return
-                }
-
-                super.visitVariable(declaration)
-            }
-
-            override fun visitGetField(expression: IrGetField) {
-                expression.symbol.owner.initializer?.expression?.acceptVoid(this)
-            }
-
-            override fun visitCall(expression: IrCall) {
-                if (expression.origin != IrStatementOrigin.PLUS) {
-                    return super.visitCall(expression)
-                }
-
-                expression.acceptChildrenVoid(this)
-            }
-
-            override fun <T> visitConst(expression: IrConst<T>) {
-                builder.append(expression.kind.valueOf(expression))
-            }
-
-            override fun visitStringConcatenation(expression: IrStringConcatenation) = expression.acceptChildrenVoid(this)
-        })
-
-        if (foldingFailed) return null
-
-        return builder.toString()
-    }
-
     return parseJsCode(foldString(code) ?: return null)
 }
 
@@ -82,4 +37,50 @@ fun parseJsCode(jsCode: String): List<JsStatement>? {
     // TODO: write debug info, see how it's done in CallExpressionTranslator.parseJsCode
 
     return parseExpressionOrStatement(jsCode, ThrowExceptionOnErrorReporter, currentScope, CodePosition(0, 0), "<js-code>")
+}
+
+fun foldString(expression: IrExpression): String? {
+    val builder = StringBuilder()
+    var foldingFailed = false
+    expression.acceptVoid(object : IrElementVisitorVoid {
+        override fun visitElement(element: IrElement) {
+            foldingFailed = true
+        }
+
+        override fun visitGetValue(expression: IrGetValue) {
+            expression.symbol.owner.acceptVoid(this)
+        }
+
+        override fun visitVariable(declaration: IrVariable) {
+            declaration.initializer?.let {
+                it.acceptVoid(this)
+                return
+            }
+
+            super.visitVariable(declaration)
+        }
+
+        override fun visitGetField(expression: IrGetField) {
+            expression.symbol.owner.initializer?.expression?.acceptVoid(this)
+        }
+
+        override fun visitCall(expression: IrCall) {
+            val owner = expression.symbol.owner
+            if (expression.origin == IrStatementOrigin.PLUS || owner == owner.correspondingPropertySymbol?.owner?.getter) {
+                return expression.acceptChildrenVoid(this)
+            }
+
+            return super.visitCall(expression)
+        }
+
+        override fun <T> visitConst(expression: IrConst<T>) {
+            builder.append(expression.kind.valueOf(expression))
+        }
+
+        override fun visitStringConcatenation(expression: IrStringConcatenation) = expression.acceptChildrenVoid(this)
+    })
+
+    if (foldingFailed) return null
+
+    return builder.toString()
 }

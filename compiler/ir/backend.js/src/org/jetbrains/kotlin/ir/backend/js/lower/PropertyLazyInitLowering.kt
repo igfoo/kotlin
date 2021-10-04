@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.ir.backend.js.lower
 
 import org.jetbrains.kotlin.backend.common.BodyLoweringPass
 import org.jetbrains.kotlin.backend.common.DeclarationTransformer
+import org.jetbrains.kotlin.backend.common.ir.isPure
 import org.jetbrains.kotlin.backend.common.ir.isTopLevel
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities.INTERNAL
 import org.jetbrains.kotlin.ir.IrStatement
@@ -14,17 +15,21 @@ import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.backend.js.ir.JsIrArithBuilder
 import org.jetbrains.kotlin.ir.backend.js.ir.JsIrBuilder
+import org.jetbrains.kotlin.ir.backend.js.transformers.irToJs.foldString
 import org.jetbrains.kotlin.ir.backend.js.utils.prependFunctionCall
-import org.jetbrains.kotlin.backend.common.ir.isPure
 import org.jetbrains.kotlin.ir.builders.declarations.addFunction
 import org.jetbrains.kotlin.ir.builders.declarations.buildField
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.persistent.PersistentIrElementBase
-import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.expressions.IrBody
+import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.IrGetField
+import org.jetbrains.kotlin.ir.expressions.IrSetField
 import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.name.Name
 import kotlin.collections.component1
 import kotlin.collections.component2
+import kotlin.collections.set
 
 class PropertyLazyInitLowering(
     private val context: JsIrBackendContext
@@ -105,7 +110,7 @@ class PropertyLazyInitLowering(
 
         if (fieldToInitializer.isEmpty()) return null
 
-        val allFieldsInFilePure = allFieldsInFilePure(fieldToInitializer.values)
+        val allFieldsInFilePure = allFieldsInFilePure(fieldToInitializer.values, context)
         fileToInitializerPureness[file] = allFieldsInFilePure
         if (allFieldsInFilePure) {
             return null
@@ -191,8 +196,12 @@ private fun createIrSetField(field: IrField, expression: IrExpression): IrSetFie
     )
 }
 
-private fun allFieldsInFilePure(fieldToInitializer: Collection<IrExpression>) =
-    fieldToInitializer.all { it.isPure(anyVariable = true) }
+private fun allFieldsInFilePure(fieldToInitializer: Collection<IrExpression>, context: JsIrBackendContext) =
+    fieldToInitializer
+        .all { expression ->
+            expression.isPure(anyVariable = true) ||
+                    expression.type == context.irBuiltIns.stringType && foldString(expression) != null
+        }
 
 class RemoveInitializersForLazyProperties(
     private val context: JsIrBackendContext
@@ -237,7 +246,7 @@ class RemoveInitializersForLazyProperties(
         val expressions = calculateFieldToExpression(declarations, context)
             .values
 
-        val allFieldsInFilePure = allFieldsInFilePure(expressions)
+        val allFieldsInFilePure = allFieldsInFilePure(expressions, context)
         fileToInitializerPureness[file] = allFieldsInFilePure
         return allFieldsInFilePure
     }
