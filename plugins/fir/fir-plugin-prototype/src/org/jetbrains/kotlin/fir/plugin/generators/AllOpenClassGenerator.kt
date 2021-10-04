@@ -56,7 +56,7 @@ class AllOpenClassGenerator(session: FirSession) : FirDeclarationGenerationExten
 
     private val predicateBasedProvider = session.predicateBasedProvider
     private val matchedClasses by lazy {
-        predicateBasedProvider.getSymbolsByPredicate(predicate).map { it.symbol }.filterIsInstance<FirRegularClassSymbol>()
+        predicateBasedProvider.getSymbolsByPredicate(predicate).filterIsInstance<FirRegularClassSymbol>()
     }
     private val classIdsForMatchedClasses: Map<ClassId, FirRegularClassSymbol> by lazy {
         matchedClasses.associateBy {
