@@ -5821,6 +5821,10 @@ Task fileCheckTest(String name, Closure<FileCheckTest> configureClosure) {
         task.llvmIr = project.file("$testOutputFileCheck/$name/out.ll")
         if (task.enabled) {
             konanArtifacts {
+                def lib = task.interop
+                if (lib != null) {
+                    UtilsKt.dependsOnKonanBuildingTask(task, lib, target)
+                }
                 // We could use `bitcode` here to make things faster. But:
                 // 1. `bitcode` has no other usages.
                 // 2. Unification should help porting to the new test infra.
@@ -5830,6 +5834,11 @@ Task fileCheckTest(String name, Closure<FileCheckTest> configureClosure) {
                     baseDir "$testOutputFileCheck/$name"
                     extraOpts project.globalTestArgs
                     extraOpts "-Xtemporary-files-dir=$testOutputFileCheck/$name", "-Xsave-llvm-ir"
+                    if (lib != null) {
+                        libraries {
+                            artifact lib
+                        }
+                    }
                 }
                 UtilsKt.dependsOnKonanBuildingTask(task, name, target)
             }

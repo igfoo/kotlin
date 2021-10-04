@@ -42,6 +42,13 @@ open class FileCheckTest : DefaultTask() {
     @get:Internal
     lateinit var llvmIr: File
 
+    /**
+     * Optional cinterop task dependency.
+     */
+    @Optional
+    @Input
+    var interop: String? = null
+
     @TaskAction
     fun run() {
         runFileCheck(annotatedSource.toPath(), llvmIr.toPath())
