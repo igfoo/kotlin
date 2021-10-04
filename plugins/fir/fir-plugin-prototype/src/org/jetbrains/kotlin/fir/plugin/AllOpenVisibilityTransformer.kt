@@ -68,7 +68,8 @@ class AllOpenVisibilityTransformer(session: FirSession) : FirStatusTransformerEx
         }
     }
 
-    override val predicate: DeclarationPredicate = hasOrUnder(AllPublicClassId.asSingleFqName())
+    private val predicate: DeclarationPredicate = hasOrUnder(AllPublicClassId.asSingleFqName())
+    override val predicates: List<DeclarationPredicate> = listOf(predicate)
 
     override val key: FirPluginKey
         get() = AllOpenPluginKey

@@ -372,7 +372,7 @@ open class FirSupertypeResolverVisitor(
         if (supertypeGenerationExtensions.isEmpty()) return
         val provider = session.predicateBasedProvider
         for (extension in supertypeGenerationExtensions) {
-            if (provider.matches(extension.predicate, klass)) {
+            if (provider.matches(extension.predicates, klass)) {
                 supertypeRefs += extension.computeAdditionalSupertypes(klass, supertypeRefs)
             }
         }

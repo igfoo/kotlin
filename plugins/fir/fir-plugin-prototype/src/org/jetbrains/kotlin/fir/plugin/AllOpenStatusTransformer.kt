@@ -29,7 +29,7 @@ class AllOpenStatusTransformer(session: FirSession) : FirStatusTransformerExtens
         return status.transform(modality = Modality.OPEN)
     }
 
-    override val predicate: DeclarationPredicate = hasOrUnder(ALL_OPEN) or metaHasOrUnder(ALL_OPEN)
+    override val predicates: List<DeclarationPredicate> = listOf(hasOrUnder(ALL_OPEN) or metaHasOrUnder(ALL_OPEN))
 
     override val key: FirPluginKey
         get() = AllOpenPluginKey

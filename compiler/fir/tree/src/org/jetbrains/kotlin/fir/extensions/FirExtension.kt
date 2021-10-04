@@ -34,7 +34,8 @@ abstract class FirExtension(val session: FirSession) {
 }
 
 abstract class FirPredicateBasedExtension(session: FirSession) : FirExtension(session) {
-    abstract val predicate: DeclarationPredicate
+    open val predicates: List<DeclarationPredicate>
+        get() = emptyList()
 }
 
 data class FirExtensionPointName(val name: Name) {

@@ -165,8 +165,9 @@ class AllOpenClassGenerator(session: FirSession) : FirDeclarationGenerationExten
     override val key: FirPluginKey
         get() = Key
 
-    override val predicate: DeclarationPredicate
-        get() = has("B".fqn())
+    private val predicate: DeclarationPredicate = has("B".fqn())
+
+    override val predicates: List<DeclarationPredicate> = listOf(predicate)
 }
 
 private object MatchedClassAttributeKey : FirDeclarationDataKey()

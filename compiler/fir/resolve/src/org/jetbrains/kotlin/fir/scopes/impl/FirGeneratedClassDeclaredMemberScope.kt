@@ -155,6 +155,6 @@ private fun FirClass.findGeneratedExtensions(useSiteSession: FirSession): List<F
         }
     } else {
         val predicateBasedProvider = useSiteSession.predicateBasedProvider
-        declarationGenerators.filter { predicateBasedProvider.matches(it.predicate, this) }
+        declarationGenerators.filter { predicateBasedProvider.matches(it.predicates, this) }
     }
 }

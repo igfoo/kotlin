@@ -87,7 +87,7 @@ class AllOpenTopLevelDeclarationsGenerator(session: FirSession) : FirDeclaration
     override val key: AllOpenPluginKey
         get() = AllOpenPluginKey
 
-    override val predicate: DeclarationPredicate
-        get() = has("A".fqn())
+    private val predicate: DeclarationPredicate = has("A".fqn())
 
+    override val predicates: List<DeclarationPredicate> = listOf(predicate)
 }

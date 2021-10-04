@@ -53,7 +53,7 @@ class FirStatusResolver(
         if (extensionStatusTransformers.isEmpty()) return status
         val declaration = this
         return extensionStatusTransformers.fold(status) { acc, it ->
-            if (session.predicateBasedProvider.matches(it.predicate, declaration)) {
+            if (session.predicateBasedProvider.matches(it.predicates, declaration)) {
                 it.operation(acc)
             } else {
                 acc

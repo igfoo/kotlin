@@ -42,5 +42,6 @@ class AllOpenSupertypeGenerator(session: FirSession) : FirSupertypeGenerationExt
     override val key: FirPluginKey
         get() = AllOpenPluginKey
 
-    override val predicate: DeclarationPredicate = has("D".fqn())
+    private val predicate: DeclarationPredicate = has("D".fqn())
+    override val predicates: List<DeclarationPredicate> = listOf(predicate)
 }

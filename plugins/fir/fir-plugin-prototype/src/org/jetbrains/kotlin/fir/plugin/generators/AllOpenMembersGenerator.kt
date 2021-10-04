@@ -87,6 +87,7 @@ class AllOpenMembersGenerator(session: FirSession) : FirDeclarationGenerationExt
 
     override val key: FirPluginKey
         get() = Key
-    override val predicate: DeclarationPredicate
-        get() = has("C".fqn())
+
+    private val predicate: DeclarationPredicate = has("C".fqn())
+    override val predicates: List<DeclarationPredicate> = listOf(predicate)
 }

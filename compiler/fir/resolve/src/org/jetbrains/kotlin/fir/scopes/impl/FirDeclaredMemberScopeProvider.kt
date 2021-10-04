@@ -68,7 +68,7 @@ class FirDeclaredMemberScopeProvider(val useSiteSession: FirSession) : FirSessio
                     existingNames,
                     symbolProvider
                 )
-                if (extensions.any { useSiteSession.predicateBasedProvider.matches(it.predicate, klass) }) {
+                if (extensions.any { useSiteSession.predicateBasedProvider.matches(it.predicates, klass) }) {
                     FirCompositeScope(
                         listOf(baseScope, FirGeneratedClassDeclaredMemberScope(useSiteSession, klass, needNestedClassifierScope = false))
                     )
@@ -88,7 +88,7 @@ class FirDeclaredMemberScopeProvider(val useSiteSession: FirSession) : FirSessio
             FirGeneratedClassNestedClassifierScope(klass, useSiteSession)
         } else {
             val baseScope = FirNestedClassifierScopeImpl(klass, useSiteSession)
-            if (extensions.any { useSiteSession.predicateBasedProvider.matches(it.predicate, klass) }) {
+            if (extensions.any { useSiteSession.predicateBasedProvider.matches(it.predicates, klass) }) {
                 FirCompositeNestedClassifierScope(
                     listOf(baseScope, FirGeneratedClassNestedClassifierScope(klass, useSiteSession)),
                     klass,

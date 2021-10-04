@@ -70,9 +70,10 @@ private class FirRegisteredPluginAnnotationsImpl(session: FirSession) : FirRegis
     override fun initialize() {
         for (extension in session.extensionService.getAllExtensions()) {
             if (extension !is FirPredicateBasedExtension) continue
-            val predicate = extension.predicate
-            annotations += predicate.annotations
-            metaAnnotations += predicate.metaAnnotations
+            for (predicate in extension.predicates) {
+                annotations += predicate.annotations
+                metaAnnotations += predicate.metaAnnotations
+            }
         }
     }
 }
