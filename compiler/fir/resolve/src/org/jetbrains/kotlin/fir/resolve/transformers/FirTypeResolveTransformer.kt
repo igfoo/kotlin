@@ -9,10 +9,15 @@ import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.declarations.utils.isFromVararg
+import org.jetbrains.kotlin.fir.diagnostics.ConeSimpleDiagnostic
+import org.jetbrains.kotlin.fir.diagnostics.DiagnosticKind
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.resolve.ScopeSession
 import org.jetbrains.kotlin.fir.resolve.diagnostics.ConeCyclicTypeBound
 import org.jetbrains.kotlin.fir.resolve.lookupSuperTypes
+import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
+import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutorByMap
+import org.jetbrains.kotlin.fir.resolve.toSymbol
 import org.jetbrains.kotlin.fir.scopes.FirCompositeScope
 import org.jetbrains.kotlin.fir.scopes.FirScope
 import org.jetbrains.kotlin.fir.scopes.createImportingScopes
@@ -195,17 +200,6 @@ open class FirTypeResolveTransformer(
         return block
     }
 
-    override fun transformDelegatedConstructorCall(
-        delegatedConstructorCall: FirDelegatedConstructorCall,
-        data: Any?
-    ): FirStatement {
-        delegatedConstructorCall.replaceConstructedTypeRef(
-            delegatedConstructorCall.constructedTypeRef.transform<FirTypeRef, Any?>(this, data)
-        )
-        delegatedConstructorCall.transformCalleeReference(this, data)
-        return delegatedConstructorCall
-    }
-
     override fun transformAnnotation(annotation: FirAnnotation, data: Any?): FirStatement {
         annotation.transformAnnotationTypeRef(this, data)
         return annotation
@@ -230,12 +224,22 @@ open class FirTypeResolveTransformer(
         firClass: FirClass,
         data: Any?
     ): FirStatement {
-        return withScopeCleanup {
-            // Otherwise annotations may try to resolve
-            // themselves as inner classes of the `firClass`
-            // if their names match
+
+        withScopeCleanup {
             firClass.transformAnnotations(this, null)
 
+            if (firClass is FirRegularClass) {
+                firClass.addTypeParametersScope()
+            }
+
+            // ConstructedTypeRef should be resolved only with type parameters, but not with nested classes and classes from supertypes
+            for (constructor in firClass.declarations.filterIsInstance<FirConstructor>()) {
+                constructor.delegatedConstructor?.let(this::resolveConstructedTypeRefForDelegatedConstructorCall)
+            }
+
+        }
+
+        return withScopeCleanup {
             // ? Is it Ok to use original file session here ?
             val superTypes = lookupSuperTypes(
                 firClass,
@@ -264,6 +268,16 @@ open class FirTypeResolveTransformer(
             // again, although there's no need in it
             transformElement(firClass, data) as FirClass
         }
+    }
+
+    private fun resolveConstructedTypeRefForDelegatedConstructorCall(
+        delegatedConstructorCall: FirDelegatedConstructorCall
+    ) {
+        delegatedConstructorCall.replaceConstructedTypeRef(
+            delegatedConstructorCall.constructedTypeRef.transform<FirTypeRef, Any?>(this, null)
+        )
+
+        delegatedConstructorCall.transformCalleeReference(this, null)
     }
 
     private fun FirMemberDeclaration.addTypeParametersScope() {
