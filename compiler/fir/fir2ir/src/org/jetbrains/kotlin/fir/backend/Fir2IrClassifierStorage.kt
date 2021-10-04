@@ -231,7 +231,7 @@ class Fir2IrClassifierStorage(
     fun registerIrClass(
         regularClass: FirRegularClass,
         parent: IrDeclarationParent? = null,
-        origin: IrDeclarationOrigin = IrDeclarationOrigin.DEFINED
+        predefinedOrigin: IrDeclarationOrigin? = null
     ): IrClass {
         val visibility = regularClass.visibility
         val modality = if (regularClass.classKind == ClassKind.ENUM_CLASS) {
@@ -247,7 +247,7 @@ class Fir2IrClassifierStorage(
                 irFactory.createClass(
                     startOffset,
                     endOffset,
-                    origin,
+                    regularClass.computeIrOrigin(predefinedOrigin),
                     symbol,
                     regularClass.name,
                     regularClass.classKind,
@@ -316,7 +316,7 @@ class Fir2IrClassifierStorage(
         typeContext: ConversionTypeContext = ConversionTypeContext.DEFAULT
     ): IrTypeParameter {
         require(index >= 0)
-        val origin = IrDeclarationOrigin.DEFINED
+        val origin = typeParameter.computeIrOrigin()
         val irTypeParameter = with(typeParameter) {
             convertWithOffsets { startOffset, endOffset ->
                 irFactory.createTypeParameter(
@@ -391,11 +391,12 @@ class Fir2IrClassifierStorage(
     fun createIrEnumEntry(
         enumEntry: FirEnumEntry,
         irParent: IrClass?,
-        origin: IrDeclarationOrigin = IrDeclarationOrigin.DEFINED
+        predefinedOrigin: IrDeclarationOrigin? = null
     ): IrEnumEntry {
         return enumEntry.convertWithOffsets { startOffset, endOffset ->
             val signature = signatureComposer.composeSignature(enumEntry)
             val result = declareIrEnumEntry(signature) { symbol ->
+                val origin = enumEntry.computeIrOrigin(predefinedOrigin)
                 irFactory.createEnumEntry(
                     startOffset, endOffset, origin, symbol, enumEntry.name
                 ).apply {
