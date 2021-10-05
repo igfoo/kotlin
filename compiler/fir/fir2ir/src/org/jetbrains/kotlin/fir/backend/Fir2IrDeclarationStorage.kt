@@ -835,7 +835,7 @@ class Fir2IrDeclarationStorage(
                             origin == IrDeclarationOrigin.IR_EXTERNAL_DECLARATION_STUB -> origin
                             delegate != null -> IrDeclarationOrigin.DELEGATED_PROPERTY_ACCESSOR
                             getter is FirDefaultPropertyGetter -> IrDeclarationOrigin.DEFAULT_PROPERTY_ACCESSOR
-                            else -> getter.computeIrOrigin()
+                            else -> origin
                         },
                         startOffset, endOffset, isLocal, containingClass
                     )
@@ -845,7 +845,7 @@ class Fir2IrDeclarationStorage(
                             when {
                                 delegate != null -> IrDeclarationOrigin.DELEGATED_PROPERTY_ACCESSOR
                                 setter is FirDefaultPropertySetter -> IrDeclarationOrigin.DEFAULT_PROPERTY_ACCESSOR
-                                else -> setter.computeIrOrigin()
+                                else -> origin
                             },
                             startOffset, endOffset, isLocal, containingClass
                         )
