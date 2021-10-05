@@ -8,6 +8,8 @@ package org.jetbrains.kotlin.ir.backend.js.transformers.irToJs
 import com.google.gwt.dev.js.ThrowExceptionOnErrorReporter
 import com.google.gwt.dev.js.rhino.CodePosition
 import org.jetbrains.kotlin.ir.IrElement
+import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
+import org.jetbrains.kotlin.ir.backend.js.lower.PropertyLazyInitLowering
 import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
@@ -20,10 +22,10 @@ import org.jetbrains.kotlin.js.backend.ast.JsStatement
 import org.jetbrains.kotlin.js.parser.parseExpressionOrStatement
 
 // Returns null if constant expression could not be parsed
-fun translateJsCodeIntoStatementList(code: IrExpression): List<JsStatement>? {
+fun translateJsCodeIntoStatementList(code: IrExpression, context: JsIrBackendContext): List<JsStatement>? {
     // TODO: support proper symbol linkage and label clash resolution
 
-    return parseJsCode(foldString(code) ?: return null)
+    return parseJsCode(foldString(code, context) ?: return null)
 }
 
 fun parseJsCode(jsCode: String): List<JsStatement>? {
@@ -39,7 +41,7 @@ fun parseJsCode(jsCode: String): List<JsStatement>? {
     return parseExpressionOrStatement(jsCode, ThrowExceptionOnErrorReporter, currentScope, CodePosition(0, 0), "<js-code>")
 }
 
-fun foldString(expression: IrExpression): String? {
+fun foldString(expression: IrExpression, context: JsIrBackendContext): String? {
     val builder = StringBuilder()
     var foldingFailed = false
     expression.acceptVoid(object : IrElementVisitorVoid {
@@ -61,16 +63,30 @@ fun foldString(expression: IrExpression): String? {
         }
 
         override fun visitGetField(expression: IrGetField) {
-            expression.symbol.owner.initializer?.expression?.acceptVoid(this)
+            val owner = expression.symbol.owner
+            owner.initializer?.expression?.acceptVoid(this)
+                ?: context.fieldToInitializer[owner]?.acceptVoid(this)
         }
 
         override fun visitCall(expression: IrCall) {
             val owner = expression.symbol.owner
-            if (expression.origin == IrStatementOrigin.PLUS || owner == owner.correspondingPropertySymbol?.owner?.getter) {
-                return expression.acceptChildrenVoid(this)
+            return when {
+                expression.origin == IrStatementOrigin.PLUS ->
+                    expression.acceptChildrenVoid(this)
+                expression.origin == PropertyLazyInitLowering.Companion.PROPERTY_INIT_FUN_CALL -> {
+                    owner.body?.acceptChildrenVoid(InitFunVisitor(context))
+                    expression.acceptChildrenVoid(this)
+                }
+                owner == owner.correspondingPropertySymbol?.owner?.getter -> {
+                    owner.body?.acceptChildrenVoid(this)
+                    expression.acceptChildrenVoid(this)
+                }
+                else -> super.visitCall(expression)
             }
+        }
 
-            return super.visitCall(expression)
+        override fun visitReturn(expression: IrReturn) {
+            expression.acceptChildrenVoid(this)
         }
 
         override fun <T> visitConst(expression: IrConst<T>) {
@@ -83,4 +99,14 @@ fun foldString(expression: IrExpression): String? {
     if (foldingFailed) return null
 
     return builder.toString()
+}
+
+private class InitFunVisitor(private val context: JsIrBackendContext) : IrElementVisitorVoid {
+    override fun visitElement(element: IrElement) {
+        element.acceptChildrenVoid(this)
+    }
+
+    override fun visitSetField(expression: IrSetField) {
+        context.fieldToInitializer[expression.symbol.owner] = expression.value
+    }
 }
