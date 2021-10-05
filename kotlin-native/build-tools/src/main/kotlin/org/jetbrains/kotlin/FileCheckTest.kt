@@ -62,6 +62,13 @@ open class FileCheckTest : DefaultTask() {
     var checkPrefix: String? = null
 
     /**
+     * Should we generate framework instead of a binary?
+     * This option is useful for, well, checking framework-specific code.
+     */
+    @Input
+    var generateFramework: Boolean = false
+
+    /**
      * Check that [inputFile] matches [annotatedFile] with FileCheck.
      */
     private fun runFileCheck(annotatedFile: Path, inputFile: Path): ProcessOutput {

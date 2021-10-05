@@ -5825,18 +5825,33 @@ Task fileCheckTest(String name, Closure<FileCheckTest> configureClosure) {
                 if (lib != null) {
                     UtilsKt.dependsOnKonanBuildingTask(task, lib, target)
                 }
-                // We could use `bitcode` here to make things faster. But:
-                // 1. `bitcode` has no other usages.
-                // 2. Unification should help porting to the new test infra.
-                // 3. Compiler might behave differently when outputting bitcode instead of object files.
-                program(name, targets: [ target ]) {
-                    srcFiles task.annotatedSource
-                    baseDir "$testOutputFileCheck/$name"
-                    extraOpts project.globalTestArgs
-                    extraOpts "-Xtemporary-files-dir=$testOutputFileCheck/$name", "-Xsave-llvm-ir"
-                    if (lib != null) {
-                        libraries {
-                            artifact lib
+                if (!task.generateFramework) {
+                    // We could use `bitcode` here to make things faster. But:
+                    // 1. `bitcode` has no other usages.
+                    // 2. Unification should help porting to the new test infra.
+                    // 3. Compiler might behave differently when outputting bitcode instead of object files.
+                    program(name, targets: [target]) {
+                        srcFiles task.annotatedSource
+                        baseDir "$testOutputFileCheck/$name"
+                        extraOpts project.globalTestArgs
+                        extraOpts "-Xtemporary-files-dir=$testOutputFileCheck/$name", "-Xsave-llvm-ir"
+                        if (lib != null) {
+                            libraries {
+                                artifact lib
+                            }
+                        }
+                    }
+                } else {
+                    // Framework support is much weakier than `frameworkTest`, but we don't need much.
+                    framework(name, targets: [target]) {
+                        srcFiles task.annotatedSource
+                        baseDir "$testOutputFileCheck/$name"
+                        extraOpts project.globalTestArgs
+                        extraOpts "-Xtemporary-files-dir=$testOutputFileCheck/$name", "-Xsave-llvm-ir"
+                        if (lib != null) {
+                            libraries {
+                                artifact lib
+                            }
                         }
                     }
                 }
@@ -5881,6 +5896,12 @@ createInterop("filecheck_signext_zeroext_interop_input") {
 fileCheckTest("filecheck_signext_zeroext_interop") {
     annotatedSource = project.file('filecheck/signext_zeroext_interop.kt')
     interop = "filecheck_signext_zeroext_interop_input"
+}
+
+fileCheckTest("signext_zeroext_objc_export") {
+    annotatedSource = project.file('filecheck/signext_zeroext_objc_export.kt')
+    generateFramework = true
+    enabled = target.family.appleFamily
 }
 
 dependencies {
